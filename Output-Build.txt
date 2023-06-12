@@ -1,0 +1,9 @@
+﻿Build started...
+1>------ Build started: Project: LoginForm, Configuration: Debug x64 ------
+1>C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\amd64\Microsoft.Common.CurrentVersion.targets(2352,5): warning MSB3270: There was a mismatch between the processor architecture of the project being built "AMD64" and the processor architecture of the reference "MySql.VisualStudio", "x86". This mismatch may cause runtime failures. Please consider changing the targeted processor architecture of your project through the Configuration Manager so as to align the processor architectures between your project and references, or take a dependency on references with a processor architecture that matches the targeted processor architecture of your project.
+1>LoginForm.cpp
+1>LoginForm.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
+1>LoginForm.vcxproj -> C:\Users\mohammed.sabbagh\source\repos\LoginForm\x64\Debug\LoginForm.exe
+1>Done building project "LoginForm.vcxproj".
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========
+========== Build started at 5:40 PM and took 01.768 seconds ==========
