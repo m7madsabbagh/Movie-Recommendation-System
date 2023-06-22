@@ -1,4 +1,5 @@
-﻿#include "LoginForm.h"
+#include "LoginForm.h"
+#include <curl/curl.h>
 
 using namespace System;
 using namespace System::Windows::Forms;
