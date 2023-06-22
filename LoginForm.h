@@ -1,4 +1,5 @@
 #pragma once
+#include "MainPage.h"
 
 namespace LoginForm {
 
@@ -9,14 +10,19 @@ namespace LoginForm {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace MySql::Data::MySqlClient;
+	using namespace System::Web;
+	using namespace System::Net::Mail;
 
 	/// <summary>
 	/// Summary for LoginForm
+/// 
 	/// </summary>
 	public ref class LoginForm : public System::Windows::Forms::Form
 	{
 	public:
-		String^ server = "Server=127.0.0.1;Uid=root;Pwd=your_password_here;Database=Database";
+		String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+		MySqlConnection^ con = gcnew MySqlConnection(constr);
+
 	private: System::Windows::Forms::Panel^ panel3;
 	public:
 	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton25;
@@ -30,15 +36,22 @@ namespace LoginForm {
 	private: System::Windows::Forms::LinkLabel^ linkLabel1;
 
 	public:
+		//to generate random otp
+		Random^ r = gcnew Random();
+		int^ OTP = r->Next(100000, 9999999);
+	private: System::Windows::Forms::Label^ label4;
+	private: System::Windows::Forms::Label^ label5;
+	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox13;
+	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox12;
+	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox11;
 
 
 
 
+	public:
+		String^ Username;
 
 
-
-
-		   MySqlConnection^ con = gcnew MySqlConnection(server);
 		LoginForm(void)
 		{
 			InitializeComponent();
@@ -101,6 +114,10 @@ namespace LoginForm {
 			this->bunifuTextbox1 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
+			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->bunifuTextbox13 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
+			this->bunifuTextbox12 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
+			this->bunifuTextbox11 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->bunifuImageButton1 = (gcnew Bunifu::Framework::UI::BunifuImageButton());
 			this->linkLabel4 = (gcnew System::Windows::Forms::LinkLabel());
 			this->bunifuTextbox6 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
@@ -111,6 +128,7 @@ namespace LoginForm {
 			this->bunifuTextbox4 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->panel3 = (gcnew System::Windows::Forms::Panel());
+			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->bunifuThinButton25 = (gcnew Bunifu::Framework::UI::BunifuThinButton2());
 			this->bunifuTextbox9 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->bunifuTextbox10 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
@@ -136,7 +154,7 @@ namespace LoginForm {
 			this->panel1->Controls->Add(this->bunifuTextbox2);
 			this->panel1->Controls->Add(this->bunifuTextbox1);
 			this->panel1->Controls->Add(this->label1);
-			this->panel1->Location = System::Drawing::Point(222, 88);
+			this->panel1->Location = System::Drawing::Point(639, 69);
 			this->panel1->Name = L"panel1";
 			this->panel1->Size = System::Drawing::Size(391, 565);
 			this->panel1->TabIndex = 0;
@@ -144,8 +162,6 @@ namespace LoginForm {
 			// 
 			// linkLabel1
 			// 
-		
-
 			this->linkLabel1->ActiveLinkColor = System::Drawing::Color::MidnightBlue;
 			this->linkLabel1->AutoSize = true;
 			this->linkLabel1->LinkColor = System::Drawing::Color::White;
@@ -228,6 +244,7 @@ namespace LoginForm {
 			this->label1->AutoSize = true;
 			this->label1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 27.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
+			this->label1->ForeColor = System::Drawing::Color::White;
 			this->label1->Location = System::Drawing::Point(116, 52);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(139, 42);
@@ -240,6 +257,10 @@ namespace LoginForm {
 			this->panel2->BackColor = System::Drawing::Color::Transparent;
 			this->panel2->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"panel2.BackgroundImage")));
 			this->panel2->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->panel2->Controls->Add(this->label5);
+			this->panel2->Controls->Add(this->bunifuTextbox13);
+			this->panel2->Controls->Add(this->bunifuTextbox12);
+			this->panel2->Controls->Add(this->bunifuTextbox11);
 			this->panel2->Controls->Add(this->bunifuImageButton1);
 			this->panel2->Controls->Add(this->linkLabel4);
 			this->panel2->Controls->Add(this->bunifuTextbox6);
@@ -249,12 +270,63 @@ namespace LoginForm {
 			this->panel2->Controls->Add(this->bunifuTextbox3);
 			this->panel2->Controls->Add(this->bunifuTextbox4);
 			this->panel2->Controls->Add(this->label2);
-			this->panel2->Location = System::Drawing::Point(566, 91);
+			this->panel2->Location = System::Drawing::Point(1018, 56);
 			this->panel2->Name = L"panel2";
-			this->panel2->Size = System::Drawing::Size(391, 565);
+			this->panel2->Size = System::Drawing::Size(391, 660);
 			this->panel2->TabIndex = 1;
 			this->panel2->Visible = false;
 			this->panel2->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &LoginForm::panel1_Paint);
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->label5->ForeColor = System::Drawing::Color::White;
+			this->label5->Location = System::Drawing::Point(111, 240);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(191, 16);
+			this->label5->TabIndex = 12;
+			this->label5->Text = L"Please enter your top 3 movies";
+			// 
+			// bunifuTextbox13
+			// 
+			this->bunifuTextbox13->BackColor = System::Drawing::Color::White;
+			this->bunifuTextbox13->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox13.BackgroundImage")));
+			this->bunifuTextbox13->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->bunifuTextbox13->ForeColor = System::Drawing::Color::Black;
+			this->bunifuTextbox13->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox13.Icon")));
+			this->bunifuTextbox13->Location = System::Drawing::Point(71, 280);
+			this->bunifuTextbox13->Name = L"bunifuTextbox13";
+			this->bunifuTextbox13->Size = System::Drawing::Size(250, 42);
+			this->bunifuTextbox13->TabIndex = 11;
+			this->bunifuTextbox13->text = L"Movie1";
+			// 
+			// bunifuTextbox12
+			// 
+			this->bunifuTextbox12->BackColor = System::Drawing::Color::White;
+			this->bunifuTextbox12->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox12.BackgroundImage")));
+			this->bunifuTextbox12->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->bunifuTextbox12->ForeColor = System::Drawing::Color::Black;
+			this->bunifuTextbox12->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox12.Icon")));
+			this->bunifuTextbox12->Location = System::Drawing::Point(71, 376);
+			this->bunifuTextbox12->Name = L"bunifuTextbox12";
+			this->bunifuTextbox12->Size = System::Drawing::Size(250, 42);
+			this->bunifuTextbox12->TabIndex = 10;
+			this->bunifuTextbox12->text = L"Movie3";
+			// 
+			// bunifuTextbox11
+			// 
+			this->bunifuTextbox11->BackColor = System::Drawing::Color::White;
+			this->bunifuTextbox11->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox11.BackgroundImage")));
+			this->bunifuTextbox11->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->bunifuTextbox11->ForeColor = System::Drawing::Color::Black;
+			this->bunifuTextbox11->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox11.Icon")));
+			this->bunifuTextbox11->Location = System::Drawing::Point(71, 328);
+			this->bunifuTextbox11->Name = L"bunifuTextbox11";
+			this->bunifuTextbox11->Size = System::Drawing::Size(250, 42);
+			this->bunifuTextbox11->TabIndex = 9;
+			this->bunifuTextbox11->text = L"Movie2";
 			// 
 			// bunifuImageButton1
 			// 
@@ -275,7 +347,7 @@ namespace LoginForm {
 			this->linkLabel4->ActiveLinkColor = System::Drawing::Color::MidnightBlue;
 			this->linkLabel4->AutoSize = true;
 			this->linkLabel4->LinkColor = System::Drawing::Color::White;
-			this->linkLabel4->Location = System::Drawing::Point(128, 443);
+			this->linkLabel4->Location = System::Drawing::Point(120, 551);
 			this->linkLabel4->Name = L"linkLabel4";
 			this->linkLabel4->Size = System::Drawing::Size(132, 13);
 			this->linkLabel4->TabIndex = 8;
@@ -290,7 +362,7 @@ namespace LoginForm {
 			this->bunifuTextbox6->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
 			this->bunifuTextbox6->ForeColor = System::Drawing::Color::Black;
 			this->bunifuTextbox6->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox6.Icon")));
-			this->bunifuTextbox6->Location = System::Drawing::Point(71, 168);
+			this->bunifuTextbox6->Location = System::Drawing::Point(71, 122);
 			this->bunifuTextbox6->Name = L"bunifuTextbox6";
 			this->bunifuTextbox6->Size = System::Drawing::Size(250, 42);
 			this->bunifuTextbox6->TabIndex = 7;
@@ -303,7 +375,7 @@ namespace LoginForm {
 			this->bunifuTextbox5->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
 			this->bunifuTextbox5->ForeColor = System::Drawing::Color::Black;
 			this->bunifuTextbox5->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox5.Icon")));
-			this->bunifuTextbox5->Location = System::Drawing::Point(71, 365);
+			this->bunifuTextbox5->Location = System::Drawing::Point(71, 489);
 			this->bunifuTextbox5->Name = L"bunifuTextbox5";
 			this->bunifuTextbox5->Size = System::Drawing::Size(250, 42);
 			this->bunifuTextbox5->TabIndex = 6;
@@ -338,7 +410,7 @@ namespace LoginForm {
 			this->bunifuThinButton22->IdleFillColor = System::Drawing::Color::White;
 			this->bunifuThinButton22->IdleForecolor = System::Drawing::Color::Black;
 			this->bunifuThinButton22->IdleLineColor = System::Drawing::Color::Black;
-			this->bunifuThinButton22->Location = System::Drawing::Point(110, 489);
+			this->bunifuThinButton22->Location = System::Drawing::Point(96, 584);
 			this->bunifuThinButton22->Margin = System::Windows::Forms::Padding(5);
 			this->bunifuThinButton22->Name = L"bunifuThinButton22";
 			this->bunifuThinButton22->Size = System::Drawing::Size(181, 49);
@@ -353,7 +425,7 @@ namespace LoginForm {
 			this->bunifuTextbox3->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
 			this->bunifuTextbox3->ForeColor = System::Drawing::Color::Black;
 			this->bunifuTextbox3->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox3.Icon")));
-			this->bunifuTextbox3->Location = System::Drawing::Point(71, 301);
+			this->bunifuTextbox3->Location = System::Drawing::Point(70, 441);
 			this->bunifuTextbox3->Name = L"bunifuTextbox3";
 			this->bunifuTextbox3->Size = System::Drawing::Size(250, 42);
 			this->bunifuTextbox3->TabIndex = 2;
@@ -366,7 +438,7 @@ namespace LoginForm {
 			this->bunifuTextbox4->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
 			this->bunifuTextbox4->ForeColor = System::Drawing::Color::Black;
 			this->bunifuTextbox4->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox4.Icon")));
-			this->bunifuTextbox4->Location = System::Drawing::Point(71, 238);
+			this->bunifuTextbox4->Location = System::Drawing::Point(71, 179);
 			this->bunifuTextbox4->Name = L"bunifuTextbox4";
 			this->bunifuTextbox4->Size = System::Drawing::Size(250, 42);
 			this->bunifuTextbox4->TabIndex = 1;
@@ -377,6 +449,7 @@ namespace LoginForm {
 			this->label2->AutoSize = true;
 			this->label2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 27.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
+			this->label2->ForeColor = System::Drawing::Color::White;
 			this->label2->Location = System::Drawing::Point(116, 52);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(152, 42);
@@ -388,6 +461,7 @@ namespace LoginForm {
 			this->panel3->BackColor = System::Drawing::Color::Transparent;
 			this->panel3->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"panel3.BackgroundImage")));
 			this->panel3->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->panel3->Controls->Add(this->label4);
 			this->panel3->Controls->Add(this->bunifuThinButton25);
 			this->panel3->Controls->Add(this->bunifuTextbox9);
 			this->panel3->Controls->Add(this->bunifuTextbox10);
@@ -396,10 +470,20 @@ namespace LoginForm {
 			this->panel3->Controls->Add(this->bunifuTextbox7);
 			this->panel3->Controls->Add(this->bunifuTextbox8);
 			this->panel3->Controls->Add(this->label3);
-			this->panel3->Location = System::Drawing::Point(991, 108);
+			this->panel3->Location = System::Drawing::Point(330, 72);
 			this->panel3->Name = L"panel3";
 			this->panel3->Size = System::Drawing::Size(391, 565);
 			this->panel3->TabIndex = 3;
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->ForeColor = System::Drawing::Color::White;
+			this->label4->Location = System::Drawing::Point(80, 221);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(121, 13);
+			this->label4->TabIndex = 10;
+			this->label4->Text = L"OTP sent to this number";
 			// 
 			// bunifuThinButton25
 			// 
@@ -473,12 +557,13 @@ namespace LoginForm {
 			this->bunifuThinButton24->IdleFillColor = System::Drawing::Color::White;
 			this->bunifuThinButton24->IdleForecolor = System::Drawing::Color::Black;
 			this->bunifuThinButton24->IdleLineColor = System::Drawing::Color::Black;
-			this->bunifuThinButton24->Location = System::Drawing::Point(106, 220);
+			this->bunifuThinButton24->Location = System::Drawing::Point(95, 239);
 			this->bunifuThinButton24->Margin = System::Windows::Forms::Padding(5);
 			this->bunifuThinButton24->Name = L"bunifuThinButton24";
 			this->bunifuThinButton24->Size = System::Drawing::Size(181, 49);
 			this->bunifuThinButton24->TabIndex = 4;
 			this->bunifuThinButton24->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+			this->bunifuThinButton24->Click += gcnew System::EventHandler(this, &LoginForm::bunifuThinButton24_Click);
 			// 
 			// bunifuThinButton23
 			// 
@@ -505,6 +590,7 @@ namespace LoginForm {
 			this->bunifuThinButton23->Size = System::Drawing::Size(141, 49);
 			this->bunifuThinButton23->TabIndex = 3;
 			this->bunifuThinButton23->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+			this->bunifuThinButton23->Click += gcnew System::EventHandler(this, &LoginForm::bunifuThinButton23_Click);
 			// 
 			// bunifuTextbox7
 			// 
@@ -537,6 +623,7 @@ namespace LoginForm {
 			this->label3->AutoSize = true;
 			this->label3->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 27.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
+			this->label3->ForeColor = System::Drawing::Color::White;
 			this->label3->Location = System::Drawing::Point(52, 62);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(305, 42);
@@ -582,25 +669,34 @@ namespace LoginForm {
 	private: System::Void linkLabel2_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
 		panel1->Visible = false;
 		panel2->Visible = true;
+		this->panel3->Visible = false;
 	}
 	private: System::Void bunifuImageButton1_Click(System::Object^ sender, System::EventArgs^ e) {
 		this->panel2->Visible = false;
 		this->panel1->Visible = true;
+		this->panel3->Visible = false;
 	}
 	private: System::Void linkLabel4_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
 		this->panel2->Visible = false;
 		this->panel1->Visible = true;
+		this->panel3->Visible = false;
 	}
+		   //register
 	private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e) {
 		try {
+
 
 
 
 			String^ Email = bunifuTextbox6->text;
 			String^ Username = bunifuTextbox4->text;
 			String^ Password = bunifuTextbox3->text;
+			String^ Movie1 = bunifuTextbox13->text;
+			String^ Movie2 = bunifuTextbox11->text;
+			String^ Movie3 = bunifuTextbox12->text;
 
-			MySqlCommand^ cmd = gcnew MySqlCommand("Insert into register_table values ('" + Email + "','" + Username + "','" + Password + "')", con);
+
+			MySqlCommand^ cmd = gcnew MySqlCommand("Insert into user_reg values ('" + Email + "','" + Username + "','" + Password + "','"+Movie1+"','"+Movie2+"','"+Movie3+"')", con);
 
 
 			MySqlDataReader^ dr;
@@ -613,6 +709,9 @@ namespace LoginForm {
 				bunifuTextbox4->text = "";
 				bunifuTextbox3->text = "";
 				bunifuTextbox5->text = "";
+				bunifuTextbox13->text = "";
+				bunifuTextbox11->text = "";
+				bunifuTextbox12->text = "";
 
 				MessageBox::Show("Sign up success\n, please go to login page");
 			}
@@ -628,40 +727,34 @@ namespace LoginForm {
 	}
 		   //login button clicked
 	private: System::Void bunifuThinButton21_Click(System::Object^ sender, System::EventArgs^ e) {
-		try
-		{
-
-
-
-
+		try {
 			String^ Password = bunifuTextbox2->text;
 			String^ Username = bunifuTextbox1->text;
-			MySqlCommand^ cmd = gcnew MySqlCommand("select * from register_table where Username='" + Username + "' and Password='" + Password + "';", con);
-
+			MySqlCommand^ cmd = gcnew MySqlCommand("select * from user_reg where Username=@Username and Password=@Password", con);
+			cmd->Parameters->AddWithValue("@Username", Username);
+			cmd->Parameters->AddWithValue("@Password", Password);
 
 			MySqlDataReader^ dr;
 			con->Open();
 
-			try
-			{
+			try {
 				dr = cmd->ExecuteReader();
 				int count = 0;
-				while (dr->Read())
-				{
+				while (dr->Read()) {
 					count += 1;
 				}
-				if (count == 1)
-				{
+				if (count == 1) {
 					MessageBox::Show("Login successful.");
+					this->Hide();  // Hide LoginForm
+
+					MainPage^ mainPageForm = gcnew MainPage();  // Create MainPage instance
+					mainPageForm->ShowDialog();  // Show MainPage
 				}
-				else
-				{
-					MessageBox::Show("Username and password is inncorrect.\n Please try again");
+				else {
+					MessageBox::Show("Username or password is incorrect.\nPlease try again");
 				}
 			}
-
-			catch (Exception^ ex)
-			{
+			catch (Exception^ ex) {
 				MessageBox::Show(ex->Message);
 			}
 			con->Close();
@@ -669,27 +762,106 @@ namespace LoginForm {
 		catch (Exception^ ex) {
 			MessageBox::Show(ex->Message);
 		}
+	}
 
 
+	private: System::Void panel1_Paint_1(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		// Method implementation here
+	}
+
+
+	private: System::Void linkLabel1_LinkClicked_1(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
+		panel1->Visible = false;
+		panel3->Visible = true;
+		panel2->Visible = false;
+	}
+	private: System::Void bunifuThinButton25_Click_1(System::Object^ sender, System::EventArgs^ e) {
+		panel1->Visible = true;
+		panel3->Visible = false;
+		panel2->Visible = false;
 
 	}
-		  
-		   private: System::Void panel1_Paint_1(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-			   // Method implementation here
-		   }
+		   
+	private: System::Void bunifuThinButton24_Click(System::Object^ sender, System::EventArgs^ e) {
+	try
+	{
+		//my email address and password
+		String^ usrmn = "mohammed.ihab2016@gmail.com";
+		String^ password = "bpgyisrkolrwzuym";
+		//my email details
+		String^ to;
+		String^ from = "mohammed.ihab2016@gmail.com";
+		String^ subject = "OTP reset password";
+		Username = bunifuTextbox8->text;
+		String^ msg = "Hi " + Username + "," + "\n" + "Your OTP is: " + OTP; // my msg with otp
+		//command to search for email address
 
+		MySqlCommand^ cmd = gcnew MySqlCommand("select * from user_reg where Username = '" + Username + "';", con);
+		MySqlDataReader^ dr;
+		con->Open();
+		dr = cmd->ExecuteReader();
+		while (dr->Read())
+		{
+			to = dr->GetString(0);// store mail address to string
+		}
+		con->Close();//close connection
+		try
+		{
+			//method to send mail to given email address thru http protocal
+			MailMessage^ mail = gcnew MailMessage(from, to, subject, msg);
+			SmtpClient^ client = gcnew SmtpClient("smtp.gmail.com"); 
+			client->Port = 587;
+			client->Credentials = gcnew System::Net::NetworkCredential(usrmn, password);
+			client->EnableSsl = true;
+			client->Send(mail);
+			MessageBox::Show("OTP sent!", "success", MessageBoxButtons::OK);
+			
+
+			label4->Text = "OTP send to " + to;
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show(ex->Message);
+		}
+	}
+	catch (Exception^ ex)
+	{
+		MessageBox::Show(ex->Message);
+	}
+}
+		   
+	private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
+		try
+		{
+			if (bunifuTextbox7->text == OTP->ToString())
+			{
+				if (bunifuTextbox9->text == bunifuTextbox10->text)
+				{
+					String^ password = bunifuTextbox10->text;
+					MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + Username + "'", con);
+
+
+					con->Open();
+					MySqlDataReader^ dr = cmd->ExecuteReader();
+					con->Close();
+					MessageBox::Show("Password reset successfully.");
+				}
+				else
+				{
+					MessageBox::Show("Confirm password does not match");
+				}
+			}
+			else
+			{
+				MessageBox::Show("OTP does not match. Please try again");
+			}
+		}
+		catch (Exception^ ex)
+		{
+			MessageBox::Show(ex->Message);
+		}
+	}
 	
-private: System::Void linkLabel1_LinkClicked_1(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
-	panel1->Visible = false;
-	panel3->Visible = true;
-	panel2->Visible = false;
-}
-private: System::Void bunifuThinButton25_Click_1(System::Object^ sender, System::EventArgs^ e) {
-	panel1->Visible = true;
-	panel3->Visible = false;
-	panel2->Visible = false;
-
-}
 
 };
 }
@@ -697,4 +869,4 @@ private: System::Void bunifuThinButton25_Click_1(System::Object^ sender, System:
 
 
 
-
+	
