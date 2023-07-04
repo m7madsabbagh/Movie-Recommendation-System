@@ -1,6 +1,10 @@
-#pragma once
+
 #include "MainPage.h"
 #include <vcclr.h>
+//#include "Registration.h"
+#include "Login.h"
+#include "Reset.h"
+
 //#include <msclr/marshal_cppstd.h>
 
 
@@ -20,70 +24,82 @@ namespace LoginForm {
 	using namespace System::Text;
 
 
-	/// <summary>
-	/// Summary for LoginForm
-/// 
-	/// </summary>
+	
+	
+
 	public ref class LoginForm : public System::Windows::Forms::Form
 	{
 	public:
 		String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
 		MySqlConnection^ con = gcnew MySqlConnection(constr);
-
-	private: System::Windows::Forms::Panel^ panel3;
-	public:
-	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton25;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox9;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox10;
-	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton24;
-	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton23;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox7;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox8;
-	private: System::Windows::Forms::Label^ label3;
-	private: System::Windows::Forms::LinkLabel^ linkLabel1;
-	
-
-	public:
-		//to generate random otp
-		Random^ r = gcnew Random();
-		int^ OTP = r->Next(100000, 9999999);
-	private: System::Windows::Forms::Label^ label4;
-	private: System::Windows::Forms::Label^ label5;
+		
 
 
 
-	private: System::Windows::Forms::CheckBox^ checkBox1;
-	private: System::Windows::Forms::CheckBox^ checkBox5;
-	private: System::Windows::Forms::CheckBox^ checkBox4;
-	private: System::Windows::Forms::CheckBox^ checkBox3;
-	private: System::Windows::Forms::CheckBox^ checkBox2;
-	private: System::Windows::Forms::CheckBox^ checkBox9;
-	private: System::Windows::Forms::CheckBox^ checkBox8;
-	private: System::Windows::Forms::CheckBox^ checkBox7;
-	private: System::Windows::Forms::CheckBox^ checkBox6;
-	private: System::Windows::Forms::CheckBox^ checkBox12;
-	private: System::Windows::Forms::CheckBox^ checkBox11;
-	private: System::Windows::Forms::CheckBox^ checkBox10;
+	private:
+		LoginHandler^ loginHandler;
+		PasswordResetter^ resetter;
+		String^ OTP;
+		
 
+		System::Windows::Forms::Panel^ panel3;
+		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton25;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox9;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox10;
+		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton24;
+		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton23;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox7;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox8;
+		System::Windows::Forms::Label^ label3;
+		System::Windows::Forms::LinkLabel^ linkLabel1;
+		System::Windows::Forms::Panel^ panel1;
+		System::Windows::Forms::Label^ label1;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox1;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox2;
+		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton21;
+		System::Windows::Forms::LinkLabel^ linkLabel2;
 
+		System::Windows::Forms::Panel^ panel2;
+		System::Windows::Forms::LinkLabel^ linkLabel4;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox6;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox5;
+		System::Windows::Forms::LinkLabel^ linkLabel3;
+		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton22;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox3;
+		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox4;
+		System::Windows::Forms::Label^ label2;
+		Bunifu::Framework::UI::BunifuImageButton^ bunifuImageButton1;
+		
 
+		System::Windows::Forms::Label^ label4;
+		System::Windows::Forms::Label^ label5;
 
-	public:
+		System::Windows::Forms::CheckBox^ checkBox1;
+		System::Windows::Forms::CheckBox^ checkBox5;
+		System::Windows::Forms::CheckBox^ checkBox4;
+		System::Windows::Forms::CheckBox^ checkBox3;
+		System::Windows::Forms::CheckBox^ checkBox2;
+		System::Windows::Forms::CheckBox^ checkBox9;
+		System::Windows::Forms::CheckBox^ checkBox8;
+		System::Windows::Forms::CheckBox^ checkBox7;
+		System::Windows::Forms::CheckBox^ checkBox6;
+		System::Windows::Forms::CheckBox^ checkBox12;
+		System::Windows::Forms::CheckBox^ checkBox11;
+		System::Windows::Forms::CheckBox^ checkBox10;
+
 		String^ Username;
 
-
+	public:
 		LoginForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
+		
+			resetter = gcnew PasswordResetter();
+			
+			
 		}
 
 	protected:
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
 		~LoginForm()
 		{
 			if (components)
@@ -91,38 +107,9 @@ namespace LoginForm {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::Panel^ panel1;
-	protected:
-	private: System::Windows::Forms::Label^ label1;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox1;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox2;
-	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton21;
-	private: System::Windows::Forms::LinkLabel^ linkLabel2;
 
-	private: System::Windows::Forms::Panel^ panel2;
-	private: System::Windows::Forms::LinkLabel^ linkLabel4;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox6;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox5;
-	private: System::Windows::Forms::LinkLabel^ linkLabel3;
-	private: Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton22;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox3;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox4;
-	private: System::Windows::Forms::Label^ label2;
-	private: Bunifu::Framework::UI::BunifuImageButton^ bunifuImageButton1;
-
-	protected:
-
-	private:
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
 		System::ComponentModel::Container^ components;
-
-#pragma region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
+	
 		void InitializeComponent(void)
 		{
 			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(LoginForm::typeid));
@@ -615,6 +602,7 @@ namespace LoginForm {
 			this->label4->Size = System::Drawing::Size(121, 13);
 			this->label4->TabIndex = 10;
 			this->label4->Text = L"OTP sent to this number";
+			
 			// 
 			// bunifuThinButton25
 			// 
@@ -787,16 +775,12 @@ namespace LoginForm {
 
 		}
 
-#pragma endregion
+
 
 	private: System::Void LoginForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		this->panel1->BringToFront();
 	}
-	private: System::Void panel1_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-	}
-	private: System::Void label1_Click(System::Object^ sender, System::EventArgs^ e) {
-	}
-
+	
 	private: System::Void linkLabel2_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
 		panel1->Visible = false;
 		panel2->Visible = true;
@@ -817,157 +801,70 @@ namespace LoginForm {
 
 		  
 		   //register
-	private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e) {
-		try {
-			String^ Email = bunifuTextbox6->text;
-			String^ Username = bunifuTextbox4->text;
-			String^ Password = bunifuTextbox3->text;
+		   
+		   private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e)
+		   {
+			   try {
+				   if (regHandler == nullptr)
+				   {
+					   regHandler = gcnew RegistrationHandler();  // Create a new RegistrationHandler object
+				   }
 
-			bool Action = checkBox1->Checked;
-			bool Adventure = checkBox5->Checked;
-			bool Animation = checkBox4->Checked;
-			bool Comedy = checkBox3->Checked;
-			bool Drama = checkBox2->Checked;
-			bool Fantasy = checkBox9->Checked;
-			bool History = checkBox6->Checked;
-			bool Horror = checkBox8->Checked;
-			bool Mystery = checkBox7->Checked;
-			bool Romance = checkBox11->Checked;
-			bool SciFi = checkBox10->Checked;
-			bool Thriller = checkBox12->Checked;
+				   String^ Email = bunifuTextbox6->Text;
+				   String^ Username = bunifuTextbox4->Text;
+				   String^ Password = bunifuTextbox3->Text;
 
-			Regex^ passwordRegex = gcnew Regex("(?=.*[A-Z])(?=.*\\W).{7,}");
-			Regex^ emailRegex = gcnew Regex("\\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[A-Za-z]{2,}\\b");
+				   String^ result = regHandler->registerUser(Email, Username, Password, checkBox1->Checked, checkBox5->Checked, checkBox4->Checked, checkBox3->Checked, checkBox2->Checked, checkBox9->Checked, checkBox6->Checked, checkBox8->Checked, checkBox7->Checked, checkBox11->Checked, checkBox10->Checked, checkBox12->Checked);
 
-			if (!passwordRegex->IsMatch(Password)) {
-				MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
-				return;
-			}
-			if (!emailRegex->IsMatch(Email)) {
-				MessageBox::Show("Email is not in a valid format");
-				return;
-			}
-
-			MySqlCommand^ cmdCheckEmail = gcnew MySqlCommand("SELECT * FROM user_reg WHERE Email = @Email", con);
-			cmdCheckEmail->Parameters->AddWithValue("@Email", Email);
-
-			MySqlCommand^ cmdCheckUsername = gcnew MySqlCommand("SELECT * FROM user_reg WHERE Username = @Username", con);
-			cmdCheckUsername->Parameters->AddWithValue("@Username", Username);
-
-			con->Open();
-
-			MySqlDataReader^ drEmail = cmdCheckEmail->ExecuteReader();
-			bool emailExists = drEmail->HasRows;
-			drEmail->Close();
-
-			MySqlDataReader^ drUsername = cmdCheckUsername->ExecuteReader();
-			bool usernameExists = drUsername->HasRows;
-			drUsername->Close();
-
-			if (emailExists) {
-				MessageBox::Show("Email already in use");
-			}
-			else if (usernameExists) {
-				MessageBox::Show("Username already in use");
-			}
-			else {
-				MySqlCommand^ cmd = gcnew MySqlCommand("INSERT INTO user_reg (Email, Username, Password, Action, Adventure, Animation, Comedy, Drama, Fantasy, History, Horror, Mystery, Romance, SciFi, Thriller) VALUES (@Email, @Username, @Password, @Action, @Adventure, @Animation, @Comedy, @Drama, @Fantasy, @History, @Horror, @Mystery, @Romance, @SciFi, @Thriller)", con);
-
-				cmd->Parameters->AddWithValue("@Email", Email);
-				cmd->Parameters->AddWithValue("@Username", Username);
-				cmd->Parameters->AddWithValue("@Password", Password);
-				cmd->Parameters->AddWithValue("@Action", Action);
-				cmd->Parameters->AddWithValue("@Adventure", Adventure);
-				cmd->Parameters->AddWithValue("@Animation", Animation);
-				cmd->Parameters->AddWithValue("@Comedy", Comedy);
-				cmd->Parameters->AddWithValue("@Drama", Drama);
-				cmd->Parameters->AddWithValue("@Fantasy", Fantasy);
-				cmd->Parameters->AddWithValue("@History", History);
-				cmd->Parameters->AddWithValue("@Horror", Horror);
-				cmd->Parameters->AddWithValue("@Mystery", Mystery);
-				cmd->Parameters->AddWithValue("@Romance", Romance);
-				cmd->Parameters->AddWithValue("@SciFi", SciFi);
-				cmd->Parameters->AddWithValue("@Thriller", Thriller);
-
-				cmd->ExecuteNonQuery();
-
-				bunifuTextbox6->text = "";
-				bunifuTextbox4->text = "";
-				bunifuTextbox3->text = "";
-
-				checkBox1->Checked = false;
-				checkBox5->Checked = false;
-				checkBox4->Checked = false;
-				checkBox3->Checked = false;
-				checkBox2->Checked = false;
-				checkBox9->Checked = false;
-				checkBox6->Checked = false;
-				checkBox8->Checked = false;
-				checkBox7->Checked = false;
-				checkBox11->Checked = false;
-				checkBox10->Checked = false;
-				checkBox12->Checked = false;
-
-				MessageBox::Show("Sign up success\n, please go to login page");
-			}
-		}
-		catch (Exception^ ex) {
-			MessageBox::Show(ex->Message);
-		}
-		finally {
-			if (con->State == ConnectionState::Open)
-				con->Close();
-		}
-	}
-
-
+				   if (result == "Success") {
+					   MessageBox::Show("Sign up success, please go to the login page.");
+				   }
+				   else {
+					   MessageBox::Show(result); // Display the error message returned by the registerUser function.
+				   }
+			   }
+			   catch (Exception^ ex) {
+				   MessageBox::Show(ex->Message);
+			   }
+			   finally {
+				   if (con->State == ConnectionState::Open)
+					   con->Close();
+			   }
+		   }
 
 		   
-	
+		
+
 		   //login button clicked
 	private: System::Void bunifuThinButton21_Click(System::Object^ sender, System::EventArgs^ e) {
 		try {
+			if (loginHandler == nullptr) {
+				loginHandler = gcnew LoginHandler();  // Create a new LoginHandler object
+			}
+
 			String^ Password = bunifuTextbox2->text;
 			String^ Username = bunifuTextbox1->text;
-			MySqlCommand^ cmd = gcnew MySqlCommand("select * from user_reg where Username=@Username and Password=@Password", con);
-			cmd->Parameters->AddWithValue("@Username", Username);
-			cmd->Parameters->AddWithValue("@Password", Password);
-			
 
+			String^ result = loginHandler->logInUser(Username, Password);
+			if (result == "Login successful.") {
+				MessageBox::Show(result);
+				this->Hide();  // Hide LoginForm
 
-			MySqlDataReader^ dr;
-			con->Open();
-
-			try {
-				dr = cmd->ExecuteReader();
-				int count = 0;
-				while (dr->Read()) {
-					count += 1;
-				}
-				if (count == 1) {
-					MessageBox::Show("Login successful.");
-					this->Hide();  // Hide LoginForm
-
-					MainPage^ mainPageForm = gcnew MainPage();  // Create MainPage instance
-					mainPageForm->ShowDialog();  // Show MainPage
-				}
-				else {
-					MessageBox::Show("Username or password is incorrect.\nPlease try again");
-				}
+				MainPage^ mainPageForm = gcnew MainPage();  // Create MainPage instance
+				mainPageForm->ShowDialog();  // Show MainPage
 			}
-			catch (Exception^ ex) {
-				MessageBox::Show(ex->Message);
+			else {
+				MessageBox::Show(result);
 			}
-			con->Close();
 		}
 		catch (Exception^ ex) {
 			MessageBox::Show(ex->Message);
 		}
 	}
-
+	
 
 	private: System::Void panel1_Paint_1(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-		// Method implementation here
+		
 	}
 
 
@@ -982,47 +879,44 @@ namespace LoginForm {
 		panel2->Visible = false;
 
 	}
-		   
+
+
+	//to reset password	
 	private: System::Void bunifuThinButton24_Click(System::Object^ sender, System::EventArgs^ e) {
+		resetter->sendResetEmail(bunifuTextbox8->text, con, OTP);
+		label4->Text = "OTP sent to email registered with this username.";
+	}
+
+
+private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
 	try
 	{
-		//my email address and password
-		String^ usrmn = "mohammed.ihab2016@gmail.com";
-		String^ password = "bpgyisrkolrwzuym";
-		//my email details
-		String^ to;
-		String^ from = "mohammed.ihab2016@gmail.com";
-		String^ subject = "OTP reset password";
-		Username = bunifuTextbox8->text;
-		String^ msg = "Hi " + Username + "," + "\n" + "Your OTP is: " + OTP; // my msg with otp
-		//command to search for email address
+		Regex^ passwordRegex = gcnew Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W])[\\s\\S]{7,}$");
 
-		MySqlCommand^ cmd = gcnew MySqlCommand("select * from user_reg where Username = '" + Username + "';", con);
-		MySqlDataReader^ dr;
-		con->Open();
-		dr = cmd->ExecuteReader();
-		while (dr->Read())
+		if (bunifuTextbox7->text == OTP)
 		{
-			to = dr->GetString(0);// store mail address to string
-		}
-		con->Close();//close connection
-		try
-		{
-			//method to send mail to given email address thru http protocal
-			MailMessage^ mail = gcnew MailMessage(from, to, subject, msg);
-			SmtpClient^ client = gcnew SmtpClient("smtp.gmail.com"); 
-			client->Port = 587;
-			client->Credentials = gcnew System::Net::NetworkCredential(usrmn, password);
-			client->EnableSsl = true;
-			client->Send(mail);
-			MessageBox::Show("OTP sent!", "success", MessageBoxButtons::OK);
-			
+			if (bunifuTextbox9->text == bunifuTextbox10->text)
+			{
+				String^ password = bunifuTextbox10->text;
+				if (!passwordRegex->IsMatch(password)) {
+					MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
+					return;
+				}
 
-			label4->Text = "OTP send to " + to;
+				MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + bunifuTextbox8->text + "'", con);
+				con->Open();
+				MySqlDataReader^ dr = cmd->ExecuteReader();
+				con->Close();
+				MessageBox::Show("Password reset successfully.");
+			}
+			else
+			{
+				MessageBox::Show("Confirm password does not match");
+			}
 		}
-		catch (Exception^ ex)
+		else
 		{
-			MessageBox::Show(ex->Message);
+			MessageBox::Show("OTP does not match. Please try again");
 		}
 	}
 	catch (Exception^ ex)
@@ -1030,46 +924,6 @@ namespace LoginForm {
 		MessageBox::Show(ex->Message);
 	}
 }
-		   
-		   private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
-			   try
-			   {
-				   Regex^ passwordRegex = gcnew Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W])[\\s\\S]{7,}$");
-
-				   if (bunifuTextbox7->text == OTP->ToString())
-				   {
-					   if (bunifuTextbox9->text == bunifuTextbox10->text)
-					   {
-						   String^ password = bunifuTextbox10->text;
-						   if (!passwordRegex->IsMatch(password)) {
-							   MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
-							   return;
-						   }
-
-						   MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + Username + "'", con);
-						   con->Open();
-						   MySqlDataReader^ dr = cmd->ExecuteReader();
-						   con->Close();
-						   MessageBox::Show("Password reset successfully.");
-					   }
-					   else
-					   {
-						   MessageBox::Show("Confirm password does not match");
-					   }
-				   }
-				   else
-				   {
-					   MessageBox::Show("OTP does not match. Please try again");
-				   }
-			   }
-			   catch (Exception^ ex)
-			   {
-				   MessageBox::Show(ex->Message);
-			   }
-		   }
-
-	
-
 
 };
 }
