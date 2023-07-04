@@ -1,5 +1,8 @@
 #pragma once
 #include "MainPage.h"
+#include <vcclr.h>
+//#include <msclr/marshal_cppstd.h>
+
 
 namespace LoginForm {
 
@@ -12,6 +15,10 @@ namespace LoginForm {
 	using namespace MySql::Data::MySqlClient;
 	using namespace System::Web;
 	using namespace System::Net::Mail;
+	using namespace System::Text::RegularExpressions;
+	using namespace System::Security::Cryptography;
+	using namespace System::Text;
+
 
 	/// <summary>
 	/// Summary for LoginForm
@@ -34,6 +41,7 @@ namespace LoginForm {
 	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox8;
 	private: System::Windows::Forms::Label^ label3;
 	private: System::Windows::Forms::LinkLabel^ linkLabel1;
+	
 
 	public:
 		//to generate random otp
@@ -41,9 +49,21 @@ namespace LoginForm {
 		int^ OTP = r->Next(100000, 9999999);
 	private: System::Windows::Forms::Label^ label4;
 	private: System::Windows::Forms::Label^ label5;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox13;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox12;
-	private: Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox11;
+
+
+
+	private: System::Windows::Forms::CheckBox^ checkBox1;
+	private: System::Windows::Forms::CheckBox^ checkBox5;
+	private: System::Windows::Forms::CheckBox^ checkBox4;
+	private: System::Windows::Forms::CheckBox^ checkBox3;
+	private: System::Windows::Forms::CheckBox^ checkBox2;
+	private: System::Windows::Forms::CheckBox^ checkBox9;
+	private: System::Windows::Forms::CheckBox^ checkBox8;
+	private: System::Windows::Forms::CheckBox^ checkBox7;
+	private: System::Windows::Forms::CheckBox^ checkBox6;
+	private: System::Windows::Forms::CheckBox^ checkBox12;
+	private: System::Windows::Forms::CheckBox^ checkBox11;
+	private: System::Windows::Forms::CheckBox^ checkBox10;
 
 
 
@@ -114,10 +134,19 @@ namespace LoginForm {
 			this->bunifuTextbox1 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
+			this->checkBox12 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox11 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox10 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox9 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox8 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox7 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox6 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox5 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox4 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox3 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox2 = (gcnew System::Windows::Forms::CheckBox());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
-			this->bunifuTextbox13 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
-			this->bunifuTextbox12 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
-			this->bunifuTextbox11 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
 			this->bunifuImageButton1 = (gcnew Bunifu::Framework::UI::BunifuImageButton());
 			this->linkLabel4 = (gcnew System::Windows::Forms::LinkLabel());
 			this->bunifuTextbox6 = (gcnew Bunifu::Framework::UI::BunifuTextbox());
@@ -257,10 +286,19 @@ namespace LoginForm {
 			this->panel2->BackColor = System::Drawing::Color::Transparent;
 			this->panel2->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"panel2.BackgroundImage")));
 			this->panel2->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
+			this->panel2->Controls->Add(this->checkBox12);
+			this->panel2->Controls->Add(this->checkBox11);
+			this->panel2->Controls->Add(this->checkBox10);
+			this->panel2->Controls->Add(this->checkBox9);
+			this->panel2->Controls->Add(this->checkBox8);
+			this->panel2->Controls->Add(this->checkBox7);
+			this->panel2->Controls->Add(this->checkBox6);
+			this->panel2->Controls->Add(this->checkBox5);
+			this->panel2->Controls->Add(this->checkBox4);
+			this->panel2->Controls->Add(this->checkBox3);
+			this->panel2->Controls->Add(this->checkBox2);
+			this->panel2->Controls->Add(this->checkBox1);
 			this->panel2->Controls->Add(this->label5);
-			this->panel2->Controls->Add(this->bunifuTextbox13);
-			this->panel2->Controls->Add(this->bunifuTextbox12);
-			this->panel2->Controls->Add(this->bunifuTextbox11);
 			this->panel2->Controls->Add(this->bunifuImageButton1);
 			this->panel2->Controls->Add(this->linkLabel4);
 			this->panel2->Controls->Add(this->bunifuTextbox6);
@@ -277,56 +315,149 @@ namespace LoginForm {
 			this->panel2->Visible = false;
 			this->panel2->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &LoginForm::panel1_Paint);
 			// 
+			// checkBox12
+			// 
+			this->checkBox12->AutoSize = true;
+			this->checkBox12->ForeColor = System::Drawing::Color::White;
+			this->checkBox12->Location = System::Drawing::Point(290, 353);
+			this->checkBox12->Name = L"checkBox12";
+			this->checkBox12->Size = System::Drawing::Size(57, 17);
+			this->checkBox12->TabIndex = 24;
+			this->checkBox12->Text = L"Thriller";
+			this->checkBox12->UseVisualStyleBackColor = true;
+			// 
+			// checkBox11
+			// 
+			this->checkBox11->AutoSize = true;
+			this->checkBox11->ForeColor = System::Drawing::Color::White;
+			this->checkBox11->Location = System::Drawing::Point(81, 353);
+			this->checkBox11->Name = L"checkBox11";
+			this->checkBox11->Size = System::Drawing::Size(72, 17);
+			this->checkBox11->TabIndex = 23;
+			this->checkBox11->Text = L"Romance";
+			this->checkBox11->UseVisualStyleBackColor = true;
+			// 
+			// checkBox10
+			// 
+			this->checkBox10->AutoSize = true;
+			this->checkBox10->ForeColor = System::Drawing::Color::White;
+			this->checkBox10->Location = System::Drawing::Point(180, 353);
+			this->checkBox10->Name = L"checkBox10";
+			this->checkBox10->Size = System::Drawing::Size(52, 17);
+			this->checkBox10->TabIndex = 22;
+			this->checkBox10->Text = L"Sci-Fi";
+			this->checkBox10->UseVisualStyleBackColor = true;
+			// 
+			// checkBox9
+			// 
+			this->checkBox9->AutoSize = true;
+			this->checkBox9->ForeColor = System::Drawing::Color::White;
+			this->checkBox9->Location = System::Drawing::Point(81, 310);
+			this->checkBox9->Name = L"checkBox9";
+			this->checkBox9->Size = System::Drawing::Size(63, 17);
+			this->checkBox9->TabIndex = 21;
+			this->checkBox9->Text = L"Fantasy";
+			this->checkBox9->UseVisualStyleBackColor = true;
+			// 
+			// checkBox8
+			// 
+			this->checkBox8->AutoSize = true;
+			this->checkBox8->ForeColor = System::Drawing::Color::White;
+			this->checkBox8->Location = System::Drawing::Point(290, 310);
+			this->checkBox8->Name = L"checkBox8";
+			this->checkBox8->Size = System::Drawing::Size(55, 17);
+			this->checkBox8->TabIndex = 20;
+			this->checkBox8->Text = L"Horror";
+			this->checkBox8->UseVisualStyleBackColor = true;
+			// 
+			// checkBox7
+			// 
+			this->checkBox7->AutoSize = true;
+			this->checkBox7->ForeColor = System::Drawing::Color::White;
+			this->checkBox7->Location = System::Drawing::Point(19, 353);
+			this->checkBox7->Name = L"checkBox7";
+			this->checkBox7->Size = System::Drawing::Size(62, 17);
+			this->checkBox7->TabIndex = 19;
+			this->checkBox7->Text = L"Mystery";
+			this->checkBox7->UseVisualStyleBackColor = true;
+			// 
+			// checkBox6
+			// 
+			this->checkBox6->AutoSize = true;
+			this->checkBox6->ForeColor = System::Drawing::Color::White;
+			this->checkBox6->Location = System::Drawing::Point(180, 310);
+			this->checkBox6->Name = L"checkBox6";
+			this->checkBox6->Size = System::Drawing::Size(58, 17);
+			this->checkBox6->TabIndex = 18;
+			this->checkBox6->Text = L"History";
+			this->checkBox6->UseVisualStyleBackColor = true;
+			// 
+			// checkBox5
+			// 
+			this->checkBox5->AutoSize = true;
+			this->checkBox5->ForeColor = System::Drawing::Color::White;
+			this->checkBox5->Location = System::Drawing::Point(81, 267);
+			this->checkBox5->Name = L"checkBox5";
+			this->checkBox5->Size = System::Drawing::Size(75, 17);
+			this->checkBox5->TabIndex = 17;
+			this->checkBox5->Text = L"Adventure";
+			this->checkBox5->UseVisualStyleBackColor = true;
+			// 
+			// checkBox4
+			// 
+			this->checkBox4->AutoSize = true;
+			this->checkBox4->ForeColor = System::Drawing::Color::White;
+			this->checkBox4->Location = System::Drawing::Point(180, 267);
+			this->checkBox4->Name = L"checkBox4";
+			this->checkBox4->Size = System::Drawing::Size(72, 17);
+			this->checkBox4->TabIndex = 16;
+			this->checkBox4->Text = L"Animation";
+			this->checkBox4->UseVisualStyleBackColor = true;
+			// 
+			// checkBox3
+			// 
+			this->checkBox3->AutoSize = true;
+			this->checkBox3->ForeColor = System::Drawing::Color::White;
+			this->checkBox3->Location = System::Drawing::Point(290, 267);
+			this->checkBox3->Name = L"checkBox3";
+			this->checkBox3->Size = System::Drawing::Size(64, 17);
+			this->checkBox3->TabIndex = 15;
+			this->checkBox3->Text = L"Comedy";
+			this->checkBox3->UseVisualStyleBackColor = true;
+			// 
+			// checkBox2
+			// 
+			this->checkBox2->AutoSize = true;
+			this->checkBox2->ForeColor = System::Drawing::Color::White;
+			this->checkBox2->Location = System::Drawing::Point(18, 310);
+			this->checkBox2->Name = L"checkBox2";
+			this->checkBox2->Size = System::Drawing::Size(57, 17);
+			this->checkBox2->TabIndex = 14;
+			this->checkBox2->Text = L"Drama";
+			this->checkBox2->UseVisualStyleBackColor = true;
+			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->ForeColor = System::Drawing::Color::White;
+			this->checkBox1->Location = System::Drawing::Point(18, 267);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(56, 17);
+			this->checkBox1->TabIndex = 13;
+			this->checkBox1->Text = L"Action";
+			this->checkBox1->UseVisualStyleBackColor = true;
+			// 
 			// label5
 			// 
 			this->label5->AutoSize = true;
 			this->label5->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->label5->ForeColor = System::Drawing::Color::White;
-			this->label5->Location = System::Drawing::Point(111, 240);
+			this->label5->Location = System::Drawing::Point(93, 237);
 			this->label5->Name = L"label5";
-			this->label5->Size = System::Drawing::Size(191, 16);
+			this->label5->Size = System::Drawing::Size(201, 16);
 			this->label5->TabIndex = 12;
-			this->label5->Text = L"Please enter your top 3 movies";
-			// 
-			// bunifuTextbox13
-			// 
-			this->bunifuTextbox13->BackColor = System::Drawing::Color::White;
-			this->bunifuTextbox13->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox13.BackgroundImage")));
-			this->bunifuTextbox13->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			this->bunifuTextbox13->ForeColor = System::Drawing::Color::Black;
-			this->bunifuTextbox13->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox13.Icon")));
-			this->bunifuTextbox13->Location = System::Drawing::Point(71, 280);
-			this->bunifuTextbox13->Name = L"bunifuTextbox13";
-			this->bunifuTextbox13->Size = System::Drawing::Size(250, 42);
-			this->bunifuTextbox13->TabIndex = 11;
-			this->bunifuTextbox13->text = L"Movie1";
-			// 
-			// bunifuTextbox12
-			// 
-			this->bunifuTextbox12->BackColor = System::Drawing::Color::White;
-			this->bunifuTextbox12->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox12.BackgroundImage")));
-			this->bunifuTextbox12->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			this->bunifuTextbox12->ForeColor = System::Drawing::Color::Black;
-			this->bunifuTextbox12->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox12.Icon")));
-			this->bunifuTextbox12->Location = System::Drawing::Point(71, 376);
-			this->bunifuTextbox12->Name = L"bunifuTextbox12";
-			this->bunifuTextbox12->Size = System::Drawing::Size(250, 42);
-			this->bunifuTextbox12->TabIndex = 10;
-			this->bunifuTextbox12->text = L"Movie3";
-			// 
-			// bunifuTextbox11
-			// 
-			this->bunifuTextbox11->BackColor = System::Drawing::Color::White;
-			this->bunifuTextbox11->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox11.BackgroundImage")));
-			this->bunifuTextbox11->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			this->bunifuTextbox11->ForeColor = System::Drawing::Color::Black;
-			this->bunifuTextbox11->Icon = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"bunifuTextbox11.Icon")));
-			this->bunifuTextbox11->Location = System::Drawing::Point(71, 328);
-			this->bunifuTextbox11->Name = L"bunifuTextbox11";
-			this->bunifuTextbox11->Size = System::Drawing::Size(250, 42);
-			this->bunifuTextbox11->TabIndex = 9;
-			this->bunifuTextbox11->text = L"Movie2";
+			this->label5->Text = L"Select movie categories you like";
 			// 
 			// bunifuImageButton1
 			// 
@@ -681,50 +812,118 @@ namespace LoginForm {
 		this->panel1->Visible = true;
 		this->panel3->Visible = false;
 	}
+
+		                                                                                                                 
+
+		  
 		   //register
 	private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e) {
 		try {
-
-
-
-
 			String^ Email = bunifuTextbox6->text;
 			String^ Username = bunifuTextbox4->text;
 			String^ Password = bunifuTextbox3->text;
-			String^ Movie1 = bunifuTextbox13->text;
-			String^ Movie2 = bunifuTextbox11->text;
-			String^ Movie3 = bunifuTextbox12->text;
 
+			bool Action = checkBox1->Checked;
+			bool Adventure = checkBox5->Checked;
+			bool Animation = checkBox4->Checked;
+			bool Comedy = checkBox3->Checked;
+			bool Drama = checkBox2->Checked;
+			bool Fantasy = checkBox9->Checked;
+			bool History = checkBox6->Checked;
+			bool Horror = checkBox8->Checked;
+			bool Mystery = checkBox7->Checked;
+			bool Romance = checkBox11->Checked;
+			bool SciFi = checkBox10->Checked;
+			bool Thriller = checkBox12->Checked;
 
-			MySqlCommand^ cmd = gcnew MySqlCommand("Insert into user_reg values ('" + Email + "','" + Username + "','" + Password + "','"+Movie1+"','"+Movie2+"','"+Movie3+"')", con);
+			Regex^ passwordRegex = gcnew Regex("(?=.*[A-Z])(?=.*\\W).{7,}");
+			Regex^ emailRegex = gcnew Regex("\\b[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[A-Za-z]{2,}\\b");
 
+			if (!passwordRegex->IsMatch(Password)) {
+				MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
+				return;
+			}
+			if (!emailRegex->IsMatch(Email)) {
+				MessageBox::Show("Email is not in a valid format");
+				return;
+			}
 
-			MySqlDataReader^ dr;
+			MySqlCommand^ cmdCheckEmail = gcnew MySqlCommand("SELECT * FROM user_reg WHERE Email = @Email", con);
+			cmdCheckEmail->Parameters->AddWithValue("@Email", Email);
+
+			MySqlCommand^ cmdCheckUsername = gcnew MySqlCommand("SELECT * FROM user_reg WHERE Username = @Username", con);
+			cmdCheckUsername->Parameters->AddWithValue("@Username", Username);
+
 			con->Open();
-			try {
-				dr = cmd->ExecuteReader();
+
+			MySqlDataReader^ drEmail = cmdCheckEmail->ExecuteReader();
+			bool emailExists = drEmail->HasRows;
+			drEmail->Close();
+
+			MySqlDataReader^ drUsername = cmdCheckUsername->ExecuteReader();
+			bool usernameExists = drUsername->HasRows;
+			drUsername->Close();
+
+			if (emailExists) {
+				MessageBox::Show("Email already in use");
+			}
+			else if (usernameExists) {
+				MessageBox::Show("Username already in use");
+			}
+			else {
+				MySqlCommand^ cmd = gcnew MySqlCommand("INSERT INTO user_reg (Email, Username, Password, Action, Adventure, Animation, Comedy, Drama, Fantasy, History, Horror, Mystery, Romance, SciFi, Thriller) VALUES (@Email, @Username, @Password, @Action, @Adventure, @Animation, @Comedy, @Drama, @Fantasy, @History, @Horror, @Mystery, @Romance, @SciFi, @Thriller)", con);
+
+				cmd->Parameters->AddWithValue("@Email", Email);
+				cmd->Parameters->AddWithValue("@Username", Username);
+				cmd->Parameters->AddWithValue("@Password", Password);
+				cmd->Parameters->AddWithValue("@Action", Action);
+				cmd->Parameters->AddWithValue("@Adventure", Adventure);
+				cmd->Parameters->AddWithValue("@Animation", Animation);
+				cmd->Parameters->AddWithValue("@Comedy", Comedy);
+				cmd->Parameters->AddWithValue("@Drama", Drama);
+				cmd->Parameters->AddWithValue("@Fantasy", Fantasy);
+				cmd->Parameters->AddWithValue("@History", History);
+				cmd->Parameters->AddWithValue("@Horror", Horror);
+				cmd->Parameters->AddWithValue("@Mystery", Mystery);
+				cmd->Parameters->AddWithValue("@Romance", Romance);
+				cmd->Parameters->AddWithValue("@SciFi", SciFi);
+				cmd->Parameters->AddWithValue("@Thriller", Thriller);
+
 				cmd->ExecuteNonQuery();
 
 				bunifuTextbox6->text = "";
 				bunifuTextbox4->text = "";
 				bunifuTextbox3->text = "";
-				bunifuTextbox5->text = "";
-				bunifuTextbox13->text = "";
-				bunifuTextbox11->text = "";
-				bunifuTextbox12->text = "";
+
+				checkBox1->Checked = false;
+				checkBox5->Checked = false;
+				checkBox4->Checked = false;
+				checkBox3->Checked = false;
+				checkBox2->Checked = false;
+				checkBox9->Checked = false;
+				checkBox6->Checked = false;
+				checkBox8->Checked = false;
+				checkBox7->Checked = false;
+				checkBox11->Checked = false;
+				checkBox10->Checked = false;
+				checkBox12->Checked = false;
 
 				MessageBox::Show("Sign up success\n, please go to login page");
 			}
-			catch (Exception^ ex) {
-				MessageBox::Show(ex->Message);
-			}
-
-			con->Close();
 		}
 		catch (Exception^ ex) {
 			MessageBox::Show(ex->Message);
 		}
+		finally {
+			if (con->State == ConnectionState::Open)
+				con->Close();
+		}
 	}
+
+
+
+		   
+	
 		   //login button clicked
 	private: System::Void bunifuThinButton21_Click(System::Object^ sender, System::EventArgs^ e) {
 		try {
@@ -733,6 +932,8 @@ namespace LoginForm {
 			MySqlCommand^ cmd = gcnew MySqlCommand("select * from user_reg where Username=@Username and Password=@Password", con);
 			cmd->Parameters->AddWithValue("@Username", Username);
 			cmd->Parameters->AddWithValue("@Password", Password);
+			
+
 
 			MySqlDataReader^ dr;
 			con->Open();
@@ -830,38 +1031,45 @@ namespace LoginForm {
 	}
 }
 		   
-	private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
-		try
-		{
-			if (bunifuTextbox7->text == OTP->ToString())
-			{
-				if (bunifuTextbox9->text == bunifuTextbox10->text)
-				{
-					String^ password = bunifuTextbox10->text;
-					MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + Username + "'", con);
+		   private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
+			   try
+			   {
+				   Regex^ passwordRegex = gcnew Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W])[\\s\\S]{7,}$");
 
+				   if (bunifuTextbox7->text == OTP->ToString())
+				   {
+					   if (bunifuTextbox9->text == bunifuTextbox10->text)
+					   {
+						   String^ password = bunifuTextbox10->text;
+						   if (!passwordRegex->IsMatch(password)) {
+							   MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
+							   return;
+						   }
 
-					con->Open();
-					MySqlDataReader^ dr = cmd->ExecuteReader();
-					con->Close();
-					MessageBox::Show("Password reset successfully.");
-				}
-				else
-				{
-					MessageBox::Show("Confirm password does not match");
-				}
-			}
-			else
-			{
-				MessageBox::Show("OTP does not match. Please try again");
-			}
-		}
-		catch (Exception^ ex)
-		{
-			MessageBox::Show(ex->Message);
-		}
-	}
+						   MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + Username + "'", con);
+						   con->Open();
+						   MySqlDataReader^ dr = cmd->ExecuteReader();
+						   con->Close();
+						   MessageBox::Show("Password reset successfully.");
+					   }
+					   else
+					   {
+						   MessageBox::Show("Confirm password does not match");
+					   }
+				   }
+				   else
+				   {
+					   MessageBox::Show("OTP does not match. Please try again");
+				   }
+			   }
+			   catch (Exception^ ex)
+			   {
+				   MessageBox::Show(ex->Message);
+			   }
+		   }
+
 	
+
 
 };
 }
