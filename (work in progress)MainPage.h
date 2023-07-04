@@ -104,9 +104,14 @@ namespace LoginForm {
 
 
         void CreatePictureBoxWithTitle(String^ path, String^ title) {
-            int picBoxWidth = 200; // set your desired picturebox width
-            int picBoxHeight = 300; // set your desired picturebox height
-            int labelHeight = 20; // set your desired label height
+            int picBoxWidth = 200; 
+            
+            int picBoxHeight = 300; 
+            
+            int labelHeight = 20; 
+            
+           
+            
 
             PictureBox^ pictureBox = gcnew PictureBox();
             pictureBox->SizeMode = PictureBoxSizeMode::StretchImage;
