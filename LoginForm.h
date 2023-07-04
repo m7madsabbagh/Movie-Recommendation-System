@@ -1,7 +1,7 @@
 
 #include "MainPage.h"
 #include <vcclr.h>
-//#include "Registration.h"
+#include "Registration.h"
 #include "Login.h"
 #include "Reset.h"
 
