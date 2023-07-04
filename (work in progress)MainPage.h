@@ -52,18 +52,6 @@ namespace LoginForm {
             responseTask->ContinueWith(gcnew Action<Task<HttpResponseMessage^>^>(this, &MainPage::HandleResponse));
         }
 
-        /*void DisplayTitle(String^ title) {
-            if (this->movieListBox->InvokeRequired) {
-                this->movieListBox->Invoke(gcnew Action<String^>(this, &MainPage::DisplayTitle), title);
-            }
-            else {
-                this->movieListBox->Items->Add(title);
-            }
-        }
-        */ 
-        
-
-
         void HandleResponse(Task<HttpResponseMessage^>^ responseTask) {
             auto response = responseTask->Result;
             if (response->IsSuccessStatusCode) {
@@ -140,20 +128,16 @@ namespace LoginForm {
 
 
 
-#pragma region 
+
         void InitializeComponent(void) {
-          //  this->movieListBox = (gcnew System::Windows::Forms::ListBox());
+          
             this->linkLabel1 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel2 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel3 = (gcnew System::Windows::Forms::LinkLabel());
             this->SuspendLayout();
             // 
-            // movieListBox
-            // 
-          /// this->movieListBox->Location = System::Drawing::Point(12, 73);
-           // this->movieListBox->Size = System::Drawing::Size(860, 542);
-            //this->movieListBox->TabIndex = 0;
-            // 
+           
+            //
             // linkLabel1
             // 
             this->linkLabel1->Location = System::Drawing::Point(366, 31);
@@ -197,12 +181,10 @@ namespace LoginForm {
             this->flowLayoutPanel->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
             this->flowLayoutPanel->WrapContents = true;
 
-            // Initialize other controls...
-
-            // Add the FlowLayoutPanel to the form
+           
             this->Controls->Add(this->flowLayoutPanel);
         }
-#pragma endregion
+
     };
 
 }
