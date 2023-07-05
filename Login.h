@@ -1,6 +1,6 @@
 
 
-#pragma once
+
 
 using namespace MySql::Data::MySqlClient;
 using namespace System;
