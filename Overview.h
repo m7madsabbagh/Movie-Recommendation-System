@@ -19,7 +19,7 @@ namespace LoginForm {
 
         System::Windows::Forms::Label^ CreateLabel(System::String^ text);
 
-        
+
 
 
         System::Void InitializeComponent() {
@@ -30,17 +30,16 @@ namespace LoginForm {
 
             this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
             this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-            this->ClientSize = System::Drawing::Size(886, 562);
+            this->ClientSize = System::Drawing::Size(500, 562);
             this->Name = L"Overview";
             this->ResumeLayout(false);
 
 
         }
-        
+
         System::Void SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e);
 
     };
 
 }
-
 
