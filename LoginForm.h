@@ -24,23 +24,32 @@ namespace LoginForm {
 	using namespace System::Text;
 
 
-	
-	
+
+
 
 	public ref class LoginForm : public System::Windows::Forms::Form
 	{
 	public:
 		String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
 		MySqlConnection^ con = gcnew MySqlConnection(constr);
-		
+		LoginForm(void)
+		{
+			InitializeComponent();
 
+			resetter = gcnew PasswordResetter();
+			regHandler = gcnew RegistrationHandler();
+
+		}
+
+		
 
 
 	private:
 		LoginHandler^ loginHandler;
 		PasswordResetter^ resetter;
 		String^ OTP;
-		
+		RegistrationHandler^ regHandler;
+
 
 		System::Windows::Forms::Panel^ panel3;
 		Bunifu::Framework::UI::BunifuThinButton2^ bunifuThinButton25;
@@ -69,7 +78,7 @@ namespace LoginForm {
 		Bunifu::Framework::UI::BunifuTextbox^ bunifuTextbox4;
 		System::Windows::Forms::Label^ label2;
 		Bunifu::Framework::UI::BunifuImageButton^ bunifuImageButton1;
-		
+
 
 		System::Windows::Forms::Label^ label4;
 		System::Windows::Forms::Label^ label5;
@@ -89,16 +98,7 @@ namespace LoginForm {
 
 		String^ Username;
 
-	public:
-		LoginForm(void)
-		{
-			InitializeComponent();
-		
-			resetter = gcnew PasswordResetter();
-			
-			
-		}
-
+	
 	protected:
 		~LoginForm()
 		{
@@ -109,7 +109,7 @@ namespace LoginForm {
 		}
 
 		System::ComponentModel::Container^ components;
-	
+
 		void InitializeComponent(void)
 		{
 			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(LoginForm::typeid));
@@ -266,7 +266,7 @@ namespace LoginForm {
 			this->label1->Size = System::Drawing::Size(139, 42);
 			this->label1->TabIndex = 0;
 			this->label1->Text = L"Sign in";
-			this->label1->Click += gcnew System::EventHandler(this, &LoginForm::label1_Click);
+			
 			// 
 			// panel2
 			// 
@@ -300,7 +300,7 @@ namespace LoginForm {
 			this->panel2->Size = System::Drawing::Size(391, 660);
 			this->panel2->TabIndex = 1;
 			this->panel2->Visible = false;
-			this->panel2->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &LoginForm::panel1_Paint);
+			
 			// 
 			// checkBox12
 			// 
@@ -602,7 +602,7 @@ namespace LoginForm {
 			this->label4->Size = System::Drawing::Size(121, 13);
 			this->label4->TabIndex = 10;
 			this->label4->Text = L"OTP sent to this number";
-			
+
 			// 
 			// bunifuThinButton25
 			// 
@@ -780,7 +780,7 @@ namespace LoginForm {
 	private: System::Void LoginForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		this->panel1->BringToFront();
 	}
-	
+
 	private: System::Void linkLabel2_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
 		panel1->Visible = false;
 		panel2->Visible = true;
@@ -797,43 +797,44 @@ namespace LoginForm {
 		this->panel3->Visible = false;
 	}
 
-		                                                                                                                 
 
-		  
+
+
 		   //register
-		   
-		   private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e)
-		   {
-			   try {
-				   if (regHandler == nullptr)
-				   {
-					   regHandler = gcnew RegistrationHandler();  // Create a new RegistrationHandler object
-				   }
 
-				   String^ Email = bunifuTextbox6->Text;
-				   String^ Username = bunifuTextbox4->Text;
-				   String^ Password = bunifuTextbox3->Text;
+	private: System::Void bunifuThinButton22_Click(System::Object^ sender, System::EventArgs^ e)
+	{
+		try {
+			if (regHandler == nullptr)
+			{
+				regHandler = gcnew RegistrationHandler();  // Create a new RegistrationHandler object
+			}
 
-				   String^ result = regHandler->registerUser(Email, Username, Password, checkBox1->Checked, checkBox5->Checked, checkBox4->Checked, checkBox3->Checked, checkBox2->Checked, checkBox9->Checked, checkBox6->Checked, checkBox8->Checked, checkBox7->Checked, checkBox11->Checked, checkBox10->Checked, checkBox12->Checked);
+			String^ Email = bunifuTextbox6->Text;
+			String^ Username = bunifuTextbox4->Text;
+			String^ Password = bunifuTextbox3->Text;
 
-				   if (result == "Success") {
-					   MessageBox::Show("Sign up success, please go to the login page.");
-				   }
-				   else {
-					   MessageBox::Show(result); // Display the error message returned by the registerUser function.
-				   }
-			   }
-			   catch (Exception^ ex) {
-				   MessageBox::Show(ex->Message);
-			   }
-			   finally {
-				   if (con->State == ConnectionState::Open)
-					   con->Close();
-			   }
-		   }
+			String^ result = regHandler->registerUser(Email, Username, Password, checkBox1->Checked, checkBox5->Checked, checkBox4->Checked, checkBox3->Checked, checkBox2->Checked, checkBox9->Checked, checkBox6->Checked, checkBox8->Checked, checkBox7->Checked, checkBox11->Checked, checkBox10->Checked, checkBox12->Checked);
 
-		   
-		
+			if (result == "Sign up success, please go to the login page") {
+				MessageBox::Show(result);
+			}
+			else {
+				MessageBox::Show(result); // Display the error message returned by the registerUser function.
+			}
+		}
+		catch (Exception^ ex) {
+			MessageBox::Show(ex->Message);
+		}
+		finally {
+			if (con->State == ConnectionState::Open)
+				con->Close();
+		}
+	}
+
+
+
+
 
 		   //login button clicked
 	private: System::Void bunifuThinButton21_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -847,6 +848,7 @@ namespace LoginForm {
 
 			String^ result = loginHandler->logInUser(Username, Password);
 			if (result == "Login successful.") {
+				loginHandler->SaveUsername(Username);  // Save the username
 				MessageBox::Show(result);
 				this->Hide();  // Hide LoginForm
 
@@ -861,10 +863,11 @@ namespace LoginForm {
 			MessageBox::Show(ex->Message);
 		}
 	}
-	
+
+
 
 	private: System::Void panel1_Paint_1(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-		
+
 	}
 
 
@@ -881,54 +884,53 @@ namespace LoginForm {
 	}
 
 
-	//to reset password	
+		   //to reset password	
 	private: System::Void bunifuThinButton24_Click(System::Object^ sender, System::EventArgs^ e) {
 		resetter->sendResetEmail(bunifuTextbox8->text, con, OTP);
 		label4->Text = "OTP sent to email registered with this username.";
 	}
 
 
-private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
-	try
-	{
-		Regex^ passwordRegex = gcnew Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W])[\\s\\S]{7,}$");
-
-		if (bunifuTextbox7->text == OTP)
+	private: System::Void bunifuThinButton23_Click(System::Object^ sender, System::EventArgs^ e) {
+		try
 		{
-			if (bunifuTextbox9->text == bunifuTextbox10->text)
-			{
-				String^ password = bunifuTextbox10->text;
-				if (!passwordRegex->IsMatch(password)) {
-					MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
-					return;
-				}
+			Regex^ passwordRegex = gcnew Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W])[\\s\\S]{7,}$");
 
-				MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + bunifuTextbox8->text + "'", con);
-				con->Open();
-				MySqlDataReader^ dr = cmd->ExecuteReader();
-				con->Close();
-				MessageBox::Show("Password reset successfully.");
+			if (bunifuTextbox7->text == OTP)
+			{
+				if (bunifuTextbox9->text == bunifuTextbox10->text)
+				{
+					String^ password = bunifuTextbox10->text;
+					if (!passwordRegex->IsMatch(password)) {
+						MessageBox::Show("Password must be at least 7 characters long, contain at least 1 capital letter and 1 special character");
+						return;
+					}
+
+					MySqlCommand^ cmd = gcnew MySqlCommand("UPDATE user_reg set Password='" + password + "' where Username = '" + bunifuTextbox8->text + "'", con);
+					con->Open();
+					MySqlDataReader^ dr = cmd->ExecuteReader();
+					con->Close();
+					MessageBox::Show("Password reset successfully.");
+				}
+				else
+				{
+					MessageBox::Show("Confirm password does not match");
+				}
 			}
 			else
 			{
-				MessageBox::Show("Confirm password does not match");
+				MessageBox::Show("OTP does not match. Please try again");
 			}
 		}
-		else
+		catch (Exception^ ex)
 		{
-			MessageBox::Show("OTP does not match. Please try again");
+			MessageBox::Show(ex->Message);
 		}
 	}
-	catch (Exception^ ex)
-	{
-		MessageBox::Show(ex->Message);
-	}
-}
 
-};
+	};
 }
 
 
 
 
-	
