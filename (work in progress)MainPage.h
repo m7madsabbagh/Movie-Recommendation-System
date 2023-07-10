@@ -33,6 +33,7 @@ namespace LoginForm {
         System::Windows::Forms::LinkLabel^ linkLabel2;
         System::Windows::Forms::LinkLabel^ linkLabel3;
         System::ComponentModel::Container^ components;
+        System::Windows::Forms::Panel^ scrollablePanel;
         System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel;
         delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
 
@@ -204,11 +205,20 @@ namespace LoginForm {
 
 #pragma region
         void InitializeComponent(void) {
-            //  this->movieListBox = (gcnew System::Windows::Forms::ListBox());
             this->linkLabel1 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel2 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel3 = (gcnew System::Windows::Forms::LinkLabel());
+            this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
             this->SuspendLayout();
+
+            // Title Label
+            System::Windows::Forms::Label^ titleLabel = gcnew System::Windows::Forms::Label();
+            titleLabel->Text = "CME Movies";
+            titleLabel->Font = gcnew System::Drawing::Font("Arial", 20, System::Drawing::FontStyle::Bold);
+            titleLabel->ForeColor = System::Drawing::Color::White;
+            titleLabel->Location = System::Drawing::Point(10, 10);
+            this->Controls->Add(titleLabel);
+
             //
             // linkLabel1
             //
@@ -217,6 +227,7 @@ namespace LoginForm {
             this->linkLabel1->Size = System::Drawing::Size(39, 13);
             this->linkLabel1->TabIndex = 1;
             this->linkLabel1->Text = L"For me";
+
             //
             // linkLabel2
             //
@@ -224,7 +235,8 @@ namespace LoginForm {
             this->linkLabel2->Name = L"linkLabel2";
             this->linkLabel2->Size = System::Drawing::Size(67, 13);
             this->linkLabel2->TabIndex = 2;
-            this->linkLabel2->Text = L"Whats new?";
+            this->linkLabel2->Text = L"What's new?";
+
             //
             // linkLabel3
             //
@@ -233,6 +245,7 @@ namespace LoginForm {
             this->linkLabel3->Size = System::Drawing::Size(43, 13);
             this->linkLabel3->TabIndex = 3;
             this->linkLabel3->Text = L"Top rated";
+
             //
             // MainPage
             //
@@ -242,20 +255,33 @@ namespace LoginForm {
             this->Controls->Add(this->linkLabel3);
             this->Controls->Add(this->linkLabel2);
             this->Controls->Add(this->linkLabel1);
-            this->Controls->Add(this->movieListBox);
             this->Name = L"MainPage";
             this->Text = L"MainPage";
             this->ResumeLayout(false);
-            //scroll
-            this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
-            this->flowLayoutPanel->Dock = System::Windows::Forms::DockStyle::Fill;
+            this->PerformLayout();
+
+            //
+            // flowLayoutPanel
+            //
+            int topMargin = 100; // Adjust the top margin here
+            this->flowLayoutPanel->Dock = System::Windows::Forms::DockStyle::Top;
             this->flowLayoutPanel->AutoScroll = true;
             this->flowLayoutPanel->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
-            this->flowLayoutPanel->WrapContents = true;
+            this->flowLayoutPanel->WrapContents = false;
+            this->flowLayoutPanel->Location = System::Drawing::Point(0, topMargin);
+            this->flowLayoutPanel->Size = System::Drawing::Size(this->Width, this->Height - topMargin);
 
-
-            this->Controls->Add(this->flowLayoutPanel);
+            //
+            // scrollablePanel
+            //
+            System::Windows::Forms::Panel^ scrollablePanel = gcnew System::Windows::Forms::Panel();
+            scrollablePanel->Dock = System::Windows::Forms::DockStyle::Fill;
+            scrollablePanel->AutoScroll = true;
+            scrollablePanel->Controls->Add(this->flowLayoutPanel);
+            this->Controls->Add(scrollablePanel);
         }
+
+
 
     };
 
