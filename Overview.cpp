@@ -1,4 +1,5 @@
 #include "Overview.h"
+#include "User.h"
 
 using namespace System;
 using namespace System::Drawing;
@@ -11,7 +12,7 @@ System::Windows::Forms::Label^ LoginForm::Overview::CreateLabel(System::String^ 
     System::Windows::Forms::Label^ label = gcnew System::Windows::Forms::Label();
     label->Text = text;
     label->AutoSize = true;
-    label->Padding = System::Windows::Forms::Padding(10); // Add padding for better spacing
+    label->Padding = System::Windows::Forms::Padding(10); 
 
     return label;
 }
@@ -20,13 +21,13 @@ System::Windows::Forms::Label^ LoginForm::Overview::CreateLabel(System::String^ 
 LoginForm::Overview::Overview(System::String^ title, System::String^ overview, System::String^ posterPath, System::String^ release_date, double rating)
 {
     this->Username = title;
-    this->MovieID = overview;
+    this->MovieID = title;
 
-    // Initialize the form and set properties
+   
     this->Text = "Movie Overview";
     this->WindowState = FormWindowState::Maximized;
 
-    // Create the TableLayoutPanel to hold the controls
+    
     TableLayoutPanel^ tableLayoutPanel = gcnew TableLayoutPanel();
     tableLayoutPanel->Dock = DockStyle::Fill;
     tableLayoutPanel->AutoSize = true;
@@ -35,28 +36,41 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
     tableLayoutPanel->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 50));
     tableLayoutPanel->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 50));
 
-    // Create and add the labels to the TableLayoutPanel
+    
     Label^ titleLabel = CreateLabel("Title: " + title);
+    titleLabel->Font = gcnew System::Drawing::Font("Arial", 22, FontStyle::Bold);
+    titleLabel->ForeColor = System::Drawing::Color::Black;
+
     Label^ overviewLabel = CreateLabel("Overview: " + overview);
+    overviewLabel->Font = gcnew System::Drawing::Font("Arial", 12);
+    overviewLabel->ForeColor = System::Drawing::Color::Black;
+
     Label^ releaseDateLabel = CreateLabel("Release Date: " + release_date);
+    overviewLabel->Font = gcnew System::Drawing::Font("Arial", 12);
+    overviewLabel->ForeColor = System::Drawing::Color::Black;
+
     Label^ ratingLabel = CreateLabel("Rating: " + rating.ToString());
+    ratingLabel->Font = gcnew System::Drawing::Font("Arial", 10, FontStyle::Bold);
+    ratingLabel->ForeColor = System::Drawing::Color::Blue;
+ 
+
 
     tableLayoutPanel->Controls->Add(titleLabel, 0, 0);
     tableLayoutPanel->Controls->Add(overviewLabel, 0, 1);
     tableLayoutPanel->Controls->Add(releaseDateLabel, 0, 2);
     tableLayoutPanel->Controls->Add(ratingLabel, 0, 3);
 
-    // Create the PictureBox and set its properties
+    
     PictureBox^ pictureBox = gcnew PictureBox();
-    pictureBox->SizeMode = PictureBoxSizeMode::Zoom;
+    pictureBox->SizeMode = PictureBoxSizeMode::AutoSize;
     pictureBox->ImageLocation = posterPath;
     pictureBox->Dock = DockStyle::Fill;
 
-    // Add the PictureBox to the TableLayoutPanel
+    
     tableLayoutPanel->Controls->Add(pictureBox, 1, 0);
     tableLayoutPanel->SetRowSpan(pictureBox, 4);
 
-    // Add the TableLayoutPanel to the form
+    
     this->Controls->Add(tableLayoutPanel);
 
     this->saveButton = gcnew Button();
@@ -67,43 +81,39 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
 
 System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e)
 {
-    // Create a new MySqlConnection
+    // Get the username from the User class
+    std::string username_std = User::Username;
+
+    // Convert std::string to System::String^
+    String^ username_cli = gcnew String(username_std.c_str());
+
     String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
     MySqlConnection^ con = gcnew MySqlConnection(constr);
 
     try {
-        // Open the connection
         con->Open();
 
-        // Create a command to check if the username exists
         MySqlCommand^ checkCommand = gcnew MySqlCommand("SELECT COUNT(*) FROM user_reg WHERE Username = @Username", con);
-        checkCommand->Parameters->AddWithValue("@Username", this->Username);
+        checkCommand->Parameters->AddWithValue("@Username", username_cli);
 
-        // Execute the command and get the count
         int count = Convert::ToInt32(checkCommand->ExecuteScalar());
 
         if (count == 0) {
-            // If the count is 0, the username does not exist in the database
             MessageBox::Show("Username does not exist in the database!");
             return;
         }
 
-        // Create a command to get the current movie IDs for the user
         MySqlCommand^ getCommand = gcnew MySqlCommand("SELECT MovieID FROM user_reg WHERE Username = @Username", con);
-        getCommand->Parameters->AddWithValue("@Username", this->Username);
+        getCommand->Parameters->AddWithValue("@Username", username_cli);
 
-        // Execute the command and get the current Movie_IDs
         MySqlDataReader^ reader = getCommand->ExecuteReader();
 
-        // Get the current Movie_IDs
         System::String^ currentMovieIds = nullptr;
-        if (reader->Read())
-        {
+        if (reader->Read()) {
             currentMovieIds = reader->GetString(0);
         }
         reader->Close();
 
-        // Append the new Movie_ID
         System::String^ newMovieIds;
         if (String::IsNullOrEmpty(currentMovieIds)) {
             newMovieIds = this->MovieID;
@@ -112,27 +122,21 @@ System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, 
             newMovieIds = currentMovieIds + "," + this->MovieID;
         }
 
-        // Print debug messages
         Console::WriteLine("Current Movie IDs: " + currentMovieIds);
         Console::WriteLine("New Movie IDs: " + newMovieIds);
 
-        // Create a command to update the Movie_IDs
         MySqlCommand^ updateCommand = gcnew MySqlCommand("UPDATE user_reg SET MovieID = @MovieID WHERE Username = @Username", con);
         updateCommand->Parameters->AddWithValue("@MovieID", newMovieIds);
-        updateCommand->Parameters->AddWithValue("@Username", this->Username);
+        updateCommand->Parameters->AddWithValue("@Username", username_cli);
 
-        // Execute the update command
         updateCommand->ExecuteNonQuery();
 
-        // Show success message
         MessageBox::Show("Successfully saved!");
     }
     catch (Exception^ ex) {
-        // Show error message
         MessageBox::Show(ex->Message);
     }
     finally {
-        // Ensure the connection is closed in case of an exception
         if (con->State == ConnectionState::Open) {
             con->Close();
         }
