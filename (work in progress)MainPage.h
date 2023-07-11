@@ -1,16 +1,16 @@
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <msclr\marshal_cppstd.h>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "Overview.h"
+#include "Display.h"
 
 
 using namespace System;
 using namespace System::Net::Http;
 using namespace System::Threading::Tasks;
-using json = nlohmann::json;
+
 
 namespace LoginForm {
 
@@ -36,6 +36,17 @@ namespace LoginForm {
         System::Windows::Forms::Panel^ scrollablePanel;
         System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel;
         delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
+        System::Void linkLabel1_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
+            Display^ displayForm = gcnew Display();
+            displayForm->Show();
+            this->Hide();
+        }
+
+
+
+
+
+
 
     public:
         MainPage(void) {
@@ -56,6 +67,7 @@ namespace LoginForm {
 
 
         delegate void PictureBoxWithTitleAndRatingDelegate(String^ path, String^ title, String^ rating, int movieId);
+
 
 
 
@@ -211,6 +223,8 @@ namespace LoginForm {
             this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
             this->SuspendLayout();
 
+
+
             // Title Label
             System::Windows::Forms::Label^ titleLabel = gcnew System::Windows::Forms::Label();
             titleLabel->Text = "CME Movies";
@@ -227,6 +241,7 @@ namespace LoginForm {
             this->linkLabel1->Size = System::Drawing::Size(39, 13);
             this->linkLabel1->TabIndex = 1;
             this->linkLabel1->Text = L"For me";
+
 
             //
             // linkLabel2
@@ -279,6 +294,11 @@ namespace LoginForm {
             scrollablePanel->AutoScroll = true;
             scrollablePanel->Controls->Add(this->flowLayoutPanel);
             this->Controls->Add(scrollablePanel);
+
+            this->linkLabel1->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel1_LinkClicked);
+
+
+
         }
 
 
