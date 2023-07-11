@@ -1,45 +1,34 @@
+#pragma once
 
+#include "User.h"
 
 namespace LoginForm {
+
+    using namespace System;
+    using namespace System::ComponentModel;
+    using namespace System::Collections;
+    using namespace System::Windows::Forms;
+    using namespace System::Data;
+    using namespace System::Drawing;
+    using namespace MySql::Data::MySqlClient;
 
     public ref class Overview : public System::Windows::Forms::Form
     {
     public:
         Overview(System::String^ title, System::String^ overview, System::String^ posterPath, System::String^ release_date, double rating);
 
+    protected:
+        ~Overview();
+
     private:
         System::Windows::Forms::Button^ saveButton;
+        System::Windows::Forms::Button^ saveRatingButton; // Button for saving the rating
+        System::Windows::Forms::NumericUpDown^ ratingInput; // Input field for the rating
         System::String^ Username;
         System::String^ MovieID;
-        System::Windows::Forms::Label^ titleLabel;
-        System::Windows::Forms::Label^ overviewLabel;
-        System::Windows::Forms::Label^ releaseDateLabel;
-        System::Windows::Forms::Label^ ratingLabel;
-        System::Windows::Forms::PictureBox^ posterPictureBox;
 
         System::Windows::Forms::Label^ CreateLabel(System::String^ text);
-
-
-
-
-        System::Void InitializeComponent() {
-            System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(Overview::typeid));
-            this->SuspendLayout();
-
-            // Overview
-
-            this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
-            this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-            this->ClientSize = System::Drawing::Size(500, 562);
-            this->Name = L"Overview";
-            this->ResumeLayout(false);
-
-
-        }
-
         System::Void SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e);
-
+        System::Void SaveRatingButton_Click(System::Object^ sender, System::EventArgs^ e); // Function for handling the button click
     };
-
 }
-
