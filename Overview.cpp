@@ -12,7 +12,7 @@ System::Windows::Forms::Label^ LoginForm::Overview::CreateLabel(System::String^ 
     System::Windows::Forms::Label^ label = gcnew System::Windows::Forms::Label();
     label->Text = text;
     label->AutoSize = true;
-    label->Padding = System::Windows::Forms::Padding(10); 
+    label->Padding = System::Windows::Forms::Padding(10);
 
     return label;
 }
@@ -23,11 +23,9 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
     this->Username = title;
     this->MovieID = title;
 
-   
     this->Text = "Movie Overview";
     this->WindowState = FormWindowState::Maximized;
 
-    
     TableLayoutPanel^ tableLayoutPanel = gcnew TableLayoutPanel();
     tableLayoutPanel->Dock = DockStyle::Fill;
     tableLayoutPanel->AutoSize = true;
@@ -36,7 +34,6 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
     tableLayoutPanel->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 50));
     tableLayoutPanel->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 50));
 
-    
     Label^ titleLabel = CreateLabel("Title: " + title);
     titleLabel->Font = gcnew System::Drawing::Font("Arial", 22, FontStyle::Bold);
     titleLabel->ForeColor = System::Drawing::Color::Black;
@@ -52,31 +49,40 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
     Label^ ratingLabel = CreateLabel("Rating: " + rating.ToString());
     ratingLabel->Font = gcnew System::Drawing::Font("Arial", 10, FontStyle::Bold);
     ratingLabel->ForeColor = System::Drawing::Color::Blue;
- 
-
 
     tableLayoutPanel->Controls->Add(titleLabel, 0, 0);
     tableLayoutPanel->Controls->Add(overviewLabel, 0, 1);
     tableLayoutPanel->Controls->Add(releaseDateLabel, 0, 2);
     tableLayoutPanel->Controls->Add(ratingLabel, 0, 3);
 
-    
     PictureBox^ pictureBox = gcnew PictureBox();
     pictureBox->SizeMode = PictureBoxSizeMode::AutoSize;
     pictureBox->ImageLocation = posterPath;
     pictureBox->Dock = DockStyle::Fill;
 
-    
     tableLayoutPanel->Controls->Add(pictureBox, 1, 0);
     tableLayoutPanel->SetRowSpan(pictureBox, 4);
 
-    
     this->Controls->Add(tableLayoutPanel);
 
     this->saveButton = gcnew Button();
     this->saveButton->Text = "Save Movie";
     this->saveButton->Click += gcnew System::EventHandler(this, &LoginForm::Overview::SaveMovieButton_Click);
     tableLayoutPanel->Controls->Add(this->saveButton, 0, 5);
+
+    // Rating input field
+    this->ratingInput = gcnew NumericUpDown();
+    this->ratingInput->Minimum = 0;
+    this->ratingInput->Maximum = 10;
+    this->ratingInput->DecimalPlaces = 1;
+    this->ratingInput->Increment = System::Decimal(0.1);
+    tableLayoutPanel->Controls->Add(this->ratingInput, 0, 6);
+
+    // Button for saving the rating
+    this->saveRatingButton = gcnew Button();
+    this->saveRatingButton->Text = "Save Rating";
+    this->saveRatingButton->Click += gcnew System::EventHandler(this, &LoginForm::Overview::SaveRatingButton_Click);
+    tableLayoutPanel->Controls->Add(this->saveRatingButton, 0, 7);
 }
 
 System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e)
@@ -142,5 +148,43 @@ System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, 
         }
     }
 }
+System::Void LoginForm::Overview::SaveRatingButton_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    // Get the username from the User class
+    std::string username_std = User::Username;
 
+    // Convert std::string to System::String^
+    String^ username_cli = gcnew String(username_std.c_str());
 
+    // Convert the rating to double
+    double rating = Convert::ToDouble(this->ratingInput->Value);
+
+    String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+    MySqlConnection^ con = gcnew MySqlConnection(constr);
+
+    try {
+        con->Open();
+
+        MySqlCommand^ insertCommand = gcnew MySqlCommand("INSERT INTO Rating_reg (Username, MovieID, Rating) VALUES (@Username, @MovieID, @Rating)", con);
+        insertCommand->Parameters->AddWithValue("@Username", username_cli);
+        insertCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+        insertCommand->Parameters->AddWithValue("@Rating", rating);
+
+        insertCommand->ExecuteNonQuery();
+
+        MessageBox::Show("Successfully saved the rating!");
+    }
+    catch (Exception^ ex) {
+        MessageBox::Show(ex->Message);
+    }
+    finally {
+        if (con->State == ConnectionState::Open) {
+            con->Close();
+        }
+    }
+}
+
+LoginForm::Overview::~Overview()
+{
+   
+}
