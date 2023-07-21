@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <msclr\marshal_cppstd.h>
 #include "rapidjson/document.h"
@@ -5,11 +6,10 @@
 #include "rapidjson/stringbuffer.h"
 #include "Overview.h"
 #include "Display.h"
-
-
-using namespace System;
-using namespace System::Net::Http;
-using namespace System::Threading::Tasks;
+#include "User.h"
+#include "Movie.h"
+#include "TopRated.h"
+#include "MyMovies.h"
 
 
 namespace LoginForm {
@@ -20,14 +20,19 @@ namespace LoginForm {
     using namespace System::Windows::Forms;
     using namespace System::Data;
     using namespace System::Drawing;
-
-
+    using namespace System::Net::Http;
+    using namespace System::Threading::Tasks;
 
 
 
     public ref class MainPage : public System::Windows::Forms::Form {
+
+        
+
     private:
         HttpClient^ client;
+        Panel^ MoviesPanel;
+        MyMovies^ moviesHandler;
         System::Windows::Forms::ListBox^ movieListBox;
         System::Windows::Forms::LinkLabel^ linkLabel1;
         System::Windows::Forms::LinkLabel^ linkLabel2;
@@ -35,24 +40,55 @@ namespace LoginForm {
         System::ComponentModel::Container^ components;
         System::Windows::Forms::Panel^ scrollablePanel;
         System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel;
+        System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel2;
+        System::Windows::Forms::Button^ logoutButton;
         delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
-        System::Void linkLabel1_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
-            Display^ displayForm = gcnew Display();
-            displayForm->Show();
+
+  
+    private:
+       
+        System::Void linkLabel3_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
+            TopRated^ topRatedForm = gcnew TopRated();
+            topRatedForm->Show();
             this->Hide();
+           
         }
 
+       /* System::Void linkLabel1_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
+            try {
+                std::string stdUsername = User::Username;
+                System::String^ loggedInUsername = gcnew System::String(stdUsername.c_str());
+
+                Display^ displayForm = gcnew Display(loggedInUsername);
+                displayForm->Show();
+                this->Hide();
+            }
+            catch (Exception^ ex) {
+                MessageBox::Show(ex->Message, "Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            }
+        }
+        */
 
 
-
-
-
+    protected:
+        ~MainPage()
+        {
+            if (components)
+            {
+                delete components;
+            }
+        }
 
     public:
+
         MainPage(void) {
+            
             InitializeComponent();
             client = gcnew HttpClient();
             MakeRequestAsync();
+            
+            
+            
         }
 
         void MakeRequestAsync() {
@@ -155,6 +191,9 @@ namespace LoginForm {
             panel->Controls->Add(titleLabel);
 
             this->flowLayoutPanel->Controls->Add(panel);
+           
+            
+           
         }
 
         void pictureBox_Click(Object^ sender, EventArgs^ e) {
@@ -170,7 +209,6 @@ namespace LoginForm {
             auto responseTask = client->GetAsync(apiUrl);
             responseTask->ContinueWith(gcnew Action<Task<HttpResponseMessage^>^>(this, &MainPage::HandleMovieDetailsResponse));
         }
-
 
 
         void HandleMovieDetailsResponse(Task<HttpResponseMessage^>^ responseTask) {
@@ -189,20 +227,23 @@ namespace LoginForm {
                 d.Parse(content_std_str.c_str());
 
                 if (d.IsObject()) {
+                    
                     std::string title = d["title"].GetString();
                     std::string overview = d["overview"].GetString();
                     std::string posterPath = d["poster_path"].GetString();
                     std::string release_date = d["release_date"].GetString();
                     double rating = d["vote_average"].GetDouble();
+                    int movieId = d["id"].GetInt();
 
-
+                    
                     String^ title_managed = gcnew String(title.c_str());
                     String^ overview_managed = gcnew String(overview.c_str());
                     String^ posterPath_managed = gcnew String(posterPath.c_str());
                     String^ release_date_managed = gcnew String(release_date.c_str());
+                    String^ movieId_managed = gcnew String(std::to_string(movieId).c_str());
 
 
-                    Overview^ overviewForm = gcnew Overview(title_managed, overview_managed, "https://image.tmdb.org/t/p/w500" + posterPath_managed, release_date_managed, rating);
+                    Overview^ overviewForm = gcnew Overview(movieId_managed, title_managed, overview_managed, "https://image.tmdb.org/t/p/w500" + posterPath_managed, release_date_managed, rating);
                     overviewForm->ShowDialog();
                 }
                 else {
@@ -212,58 +253,39 @@ namespace LoginForm {
         }
 
 
-
-
-
 #pragma region
         void InitializeComponent(void) {
+            
             this->linkLabel1 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel2 = (gcnew System::Windows::Forms::LinkLabel());
             this->linkLabel3 = (gcnew System::Windows::Forms::LinkLabel());
             this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
             this->SuspendLayout();
 
-
-
-            // Title Label
-            System::Windows::Forms::Label^ titleLabel = gcnew System::Windows::Forms::Label();
-            titleLabel->Text = "CME Movies";
-            titleLabel->Font = gcnew System::Drawing::Font("Arial", 20, System::Drawing::FontStyle::Bold);
-            titleLabel->ForeColor = System::Drawing::Color::White;
+            System::Windows::Forms::Label^ titleLabel = (gcnew System::Windows::Forms::Label());
+            titleLabel->BackColor = System::Drawing::Color::Transparent;
+            titleLabel->Text = L"CME Movies";
+            titleLabel->Font = (gcnew System::Drawing::Font(L"Arial", 30, System::Drawing::FontStyle::Bold));
+            titleLabel->ForeColor = System::Drawing::Color::Black;
             titleLabel->Location = System::Drawing::Point(10, 10);
             this->Controls->Add(titleLabel);
+            
 
-            //
-            // linkLabel1
-            //
-            this->linkLabel1->Location = System::Drawing::Point(366, 31);
+            this->linkLabel1->Location = System::Drawing::Point(600, 100);
             this->linkLabel1->Name = L"linkLabel1";
             this->linkLabel1->Size = System::Drawing::Size(39, 13);
             this->linkLabel1->TabIndex = 1;
             this->linkLabel1->Text = L"For me";
-
-
-            //
-            // linkLabel2
-            //
-            this->linkLabel2->Location = System::Drawing::Point(584, 31);
+            this->linkLabel2->Location = System::Drawing::Point(650, 100);
             this->linkLabel2->Name = L"linkLabel2";
             this->linkLabel2->Size = System::Drawing::Size(67, 13);
             this->linkLabel2->TabIndex = 2;
-            this->linkLabel2->Text = L"What's new?";
-
-            //
-            // linkLabel3
-            //
-            this->linkLabel3->Location = System::Drawing::Point(472, 31);
+            this->linkLabel2->Text = L"What\'s new\?";
+            this->linkLabel3->Location = System::Drawing::Point(1500, 100);
             this->linkLabel3->Name = L"linkLabel3";
             this->linkLabel3->Size = System::Drawing::Size(43, 13);
             this->linkLabel3->TabIndex = 3;
             this->linkLabel3->Text = L"Top rated";
-
-            //
-            // MainPage
-            //
             this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
             this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
             this->ClientSize = System::Drawing::Size(1043, 636);
@@ -274,30 +296,39 @@ namespace LoginForm {
             this->Text = L"MainPage";
             this->ResumeLayout(false);
             this->PerformLayout();
-
-            //
-            // flowLayoutPanel
-            //
-            int topMargin = 100; // Adjust the top margin here
+            System::Int32 topMargin = 250;
             this->flowLayoutPanel->Dock = System::Windows::Forms::DockStyle::Top;
             this->flowLayoutPanel->AutoScroll = true;
             this->flowLayoutPanel->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
             this->flowLayoutPanel->WrapContents = false;
             this->flowLayoutPanel->Location = System::Drawing::Point(0, topMargin);
-            this->flowLayoutPanel->Size = System::Drawing::Size(this->Width, this->Height - topMargin);
-
-            //
-            // scrollablePanel
-            //
-            System::Windows::Forms::Panel^ scrollablePanel = gcnew System::Windows::Forms::Panel();
+            this->flowLayoutPanel->Size = System::Drawing::Size(this->Width, (this->Height - topMargin));
+            this->flowLayoutPanel->Anchor = ((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+                | System::Windows::Forms::AnchorStyles::Right);
+            System::Windows::Forms::Panel^ scrollablePanel = (gcnew System::Windows::Forms::Panel());
             scrollablePanel->Dock = System::Windows::Forms::DockStyle::Fill;
             scrollablePanel->AutoScroll = true;
             scrollablePanel->Controls->Add(this->flowLayoutPanel);
             this->Controls->Add(scrollablePanel);
 
-            this->linkLabel1->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel1_LinkClicked);
+            this->flowLayoutPanel2 = (gcnew System::Windows::Forms::FlowLayoutPanel());
+            this->flowLayoutPanel2->Dock = System::Windows::Forms::DockStyle::Top;
+            this->flowLayoutPanel2->AutoScroll = true;
+            this->flowLayoutPanel2->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
+            this->flowLayoutPanel2->WrapContents = false;
+            this->flowLayoutPanel2->Location = System::Drawing::Point(0, topMargin + this->flowLayoutPanel->Height + 50); // Below first FlowLayoutPanel
+            this->flowLayoutPanel2->Size = System::Drawing::Size(this->Width, (this->Height - topMargin));
+            this->flowLayoutPanel2->Anchor = ((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left) | System::Windows::Forms::AnchorStyles::Right);
 
+            System::Windows::Forms::Panel^ scrollablePanel2 = (gcnew System::Windows::Forms::Panel());
+            scrollablePanel2->Dock = System::Windows::Forms::DockStyle::Fill;
+            scrollablePanel2->AutoScroll = true;
+            scrollablePanel2->Controls->Add(this->flowLayoutPanel2);
 
+            this->Controls->Add(scrollablePanel2);
+
+            this->linkLabel3->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel3_LinkClicked);
+            //this->linkLabel1->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel1_LinkClicked);
 
         }
 
