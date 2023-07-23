@@ -40,12 +40,14 @@ void Display::LoadSavedMovies(String^ username) {
 
 
 
-void Display::GetMovieDetailsAsync(String^ movieId) {
+void Display::GetMovieDetailsAsync(String^ movieTitle) {
     String^ apiKey = "e18bd6b624b9b189e366056ce94a353c";
-    String^ apiUrl = "https://api.themoviedb.org/3/movie/" + apiKey;
+    String^ escapedMovieTitle = Uri::EscapeDataString(movieTitle);
+    String^ apiUrl = "https://api.themoviedb.org/3/search/movie?api_key=" + apiKey + "&query=" + escapedMovieTitle;
     auto responseTask = client->GetAsync(apiUrl);
     responseTask->ContinueWith(gcnew Action<Task<HttpResponseMessage^>^>(this, &Display::HandleMovieDetailsResponse));
 }
+
 
 void Display::HandleMovieDetailsResponse(Task<HttpResponseMessage^>^ responseTask) {
     auto response = responseTask->Result;
@@ -62,12 +64,15 @@ void Display::HandleMovieDetailsResponse(Task<HttpResponseMessage^>^ responseTas
         rapidjson::Document d;
         d.Parse(content_std_str.c_str());
 
-        if (d.IsObject()) {
-            std::string title = d["title"].GetString();
-            std::string overview = d["overview"].GetString();
-            std::string posterPath = d["poster_path"].GetString();
-            std::string release_date = d["release_date"].GetString();
-            double rating = d["vote_average"].GetDouble();
+        if (d.IsObject() && d.HasMember("results") && d["results"].IsArray() && !d["results"].Empty()) {
+            // Taking the first result from the search
+            const rapidjson::Value& movie = d["results"][0];
+
+            std::string title = movie["title"].GetString();
+            std::string overview = movie["overview"].GetString();
+            std::string posterPath = movie["poster_path"].GetString();
+            std::string release_date = movie["release_date"].GetString();
+            double rating = movie["vote_average"].GetDouble();
 
             // Convert from std::string to System::String^
             String^ title_managed = gcnew String(title.c_str());
@@ -84,6 +89,7 @@ void Display::HandleMovieDetailsResponse(Task<HttpResponseMessage^>^ responseTas
         }
     }
 }
+
 
 void Display::CreatePictureBoxWithTitle(String^ path, String^ title) {
     int picBoxWidth = 200;
