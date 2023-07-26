@@ -1,5 +1,5 @@
 //10.1.8.18:4201
-#pragma once
+    #pragma once
     #include <iostream>
     #include <msclr\marshal_cppstd.h>
     #include "rapidjson/document.h"
@@ -10,7 +10,7 @@
     #include "User.h"
     #include "Movie.h"
     #include "TopRated.h"
-#include "Recommendation.h"
+    #include "Recommed.h"
    
 
 
@@ -27,17 +27,16 @@
         using namespace System::Threading::Tasks;
       
 
-        ref class LoginForm;
+          ref class LoginForm;
 
         public ref class MainPage : public System::Windows::Forms::Form {
 
-
+          
 
         private:
            
             HttpClient^ client; 
             Panel^ MoviesPanel;
-            RecommendationHandler^ recHandler;
             String^ username;
             String^ movieIdStr;
             System::Windows::Forms::ListBox^ movieListBox;
@@ -51,16 +50,27 @@
             System::Windows::Forms::Button^ logoutButton;
             delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
             System::Windows::Forms::Panel^ recommendedMoviesPanel;
-
+            System::Windows::Forms::Button^ loadMoreButton;
+            int currentPage;
+            LoginForm^ loginForm;
 
             System::Void linkLabel3_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
                 TopRated^ topRatedForm = gcnew TopRated();
                 topRatedForm->Show();
-            
 
             }
+            System::Void linkLabel2_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
+                List<String^>^ userGenres = gcnew List<String^>();
+                List<Movie^>^ allMovies = gcnew List<Movie^>();
+                std::string stdUsername = User::Username;
+                System::String^ LoggedInUsername = gcnew System::String(stdUsername.c_str());
 
-       
+                
+                Recommed^ recommedForm = gcnew Recommed(userGenres, allMovies,LoggedInUsername);
+                recommedForm->Show();
+            }
+
+           
 
             System::Void linkLabel1_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
                 try {
@@ -91,26 +101,36 @@
             }
 
         public:
-
+           
+            
             MainPage(void) {
 
                 InitializeComponent();
+              
                 client = gcnew HttpClient();
+                loadMoreButton->Click += gcnew System::EventHandler(this, &MainPage::loadMoreButton_Click);
+                currentPage = 1;
                 MakeRequestAsync();
-                DisplayRecommendedMovies();
+                //DisplayRecommendedMovies();
+                
                 
 
 
             }
+            
 
             void MakeRequestAsync() {
                 String^ apiKey = "e18bd6b624b9b189e366056ce94a353c";
-                String^ apiUrl = "https://api.themoviedb.org/3/movie/popular?api_key=" + apiKey;
+                String^ apiUrl = "https://api.themoviedb.org/3/movie/popular?api_key=" + apiKey + "&page=" + currentPage;
                 auto responseTask = client->GetAsync(apiUrl);
                 responseTask->ContinueWith(gcnew Action<Task<HttpResponseMessage^>^>(this, &MainPage::HandleResponse));
             }
 
-       
+            
+            void loadMoreButton_Click(Object^ sender, EventArgs^ e) {
+                currentPage++;  
+                MakeRequestAsync();  
+            }
 
 
 
@@ -205,7 +225,7 @@
                 panel->Controls->Add(titleLabel);
 
                 this->flowLayoutPanel->Controls->Add(panel);
-                //this->flowLayoutPanel2->Controls->Add(panel);
+               
 
 
             }
@@ -226,25 +246,10 @@
             }
 
            
-            void DisplayRecommendedMovies()
-            {
-                if (recHandler == nullptr)
-                {
-                    recHandler = gcnew RecommendationHandler();
-                }
+           
 
-                List<Movie^>^ recommendedMovies = recHandler->getRecommendedMovies(username);
-                
 
-                for each (Movie ^ movie in recommendedMovies)
-                {
-                    System::Windows::Forms::PictureBox^ pb = gcnew System::Windows::Forms::PictureBox();
-                    pb->SizeMode = PictureBoxSizeMode::StretchImage;
-                    pb->Load(movie->ImageUrl); // this method downloads and displays the image
-                    this->flowLayoutPanel2->Controls->Add(pb);
-                }
-            }
-
+            
 
 
 
@@ -290,85 +295,103 @@
 
 
 #pragma region
-        void InitializeComponent(void) {
-
-            
+            void InitializeComponent(void) {
 
 
-            this->linkLabel1 = (gcnew System::Windows::Forms::LinkLabel());
-            this->linkLabel2 = (gcnew System::Windows::Forms::LinkLabel());
-            this->linkLabel3 = (gcnew System::Windows::Forms::LinkLabel());
-            this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
-            this->SuspendLayout();
-
-       
-
-            System::Windows::Forms::Label^ titleLabel = (gcnew System::Windows::Forms::Label());
-            titleLabel->BackColor = System::Drawing::Color::Transparent;
-            titleLabel->Text = L"CME Movies";
-            titleLabel->Font = (gcnew System::Drawing::Font(L"Arial", 30, System::Drawing::FontStyle::Bold));
-            titleLabel->ForeColor = System::Drawing::Color::Black;
-            titleLabel->Location = System::Drawing::Point(10, 10);
-            this->Controls->Add(titleLabel);
 
 
-            this->linkLabel1->Location = System::Drawing::Point(600, 100);
-            this->linkLabel1->Name = L"linkLabel1";
-            this->linkLabel1->Size = System::Drawing::Size(39, 13);
-            this->linkLabel1->TabIndex = 1;
-            this->linkLabel1->Text = L"For me";
-            this->linkLabel2->Location = System::Drawing::Point(650, 100);
-            this->linkLabel2->Name = L"linkLabel2";
-            this->linkLabel2->Size = System::Drawing::Size(67, 13);
-            this->linkLabel2->TabIndex = 2;
-            this->linkLabel2->Text = L"What\'s new\?";
-            this->linkLabel3->Location = System::Drawing::Point(1500, 100);
-            this->linkLabel3->Name = L"linkLabel3";
-            this->linkLabel3->Size = System::Drawing::Size(43, 13);
-            this->linkLabel3->TabIndex = 3;
-            this->linkLabel3->Text = L"Top rated";
-            this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
-            this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-            this->ClientSize = System::Drawing::Size(1043, 636);
-            this->Controls->Add(this->linkLabel3);
-            this->Controls->Add(this->linkLabel2);
-            this->Controls->Add(this->linkLabel1);
-            this->Name = L"MainPage";
-            this->Text = L"MainPage";
-            this->ResumeLayout(false);
-            this->PerformLayout();
-            System::Int32 topMargin = 250;
-            this->flowLayoutPanel->Dock = System::Windows::Forms::DockStyle::Top;
-            this->flowLayoutPanel->AutoScroll = true;
-            this->flowLayoutPanel->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
-            this->flowLayoutPanel->WrapContents = false;
-            this->flowLayoutPanel->Location = System::Drawing::Point(0, topMargin);
-            this->flowLayoutPanel->Size = System::Drawing::Size(this->Width, (this->Height - topMargin));
-            this->flowLayoutPanel->Anchor = ((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
-                | System::Windows::Forms::AnchorStyles::Right);
-            System::Windows::Forms::Panel^ scrollablePanel = (gcnew System::Windows::Forms::Panel());
-            scrollablePanel->Dock = System::Windows::Forms::DockStyle::Fill;
-            scrollablePanel->AutoScroll = true;
-            scrollablePanel->Controls->Add(this->flowLayoutPanel);
-            this->Controls->Add(scrollablePanel);
+                this->linkLabel1 = (gcnew System::Windows::Forms::LinkLabel());
+                this->linkLabel2 = (gcnew System::Windows::Forms::LinkLabel());
+                this->linkLabel3 = (gcnew System::Windows::Forms::LinkLabel());
+                this->flowLayoutPanel = (gcnew System::Windows::Forms::FlowLayoutPanel());
+                this->SuspendLayout();
 
-            this->flowLayoutPanel2 = gcnew System::Windows::Forms::FlowLayoutPanel();
-            this->flowLayoutPanel2->AutoSize = true;
-            this->flowLayoutPanel2->Location = System::Drawing::Point(0, this->flowLayoutPanel->Bottom + 10); 
-            this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
-            this->flowLayoutPanel2->Size = System::Drawing::Size(800, 450);
-           
-            System::Windows::Forms::Panel^ scrollablePanel2 = (gcnew System::Windows::Forms::Panel());
-            scrollablePanel2->Dock = System::Windows::Forms::DockStyle::Fill;
-            scrollablePanel2->AutoScroll = true;
-            scrollablePanel2->Controls->Add(this->flowLayoutPanel2);
 
-            this->Controls->Add(scrollablePanel2);
 
-            this->linkLabel3->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel3_LinkClicked);
-            this->linkLabel1->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel1_LinkClicked);
 
-        }
+
+                System::Windows::Forms::Label^ titleLabel = (gcnew System::Windows::Forms::Label());
+                titleLabel->BackColor = System::Drawing::Color::Transparent;
+                titleLabel->Text = L"CME Movies";
+                titleLabel->Font = (gcnew System::Drawing::Font(L"Arial", 40, System::Drawing::FontStyle::Bold));
+                titleLabel->ForeColor = System::Drawing::Color::Black;
+                titleLabel->Location = System::Drawing::Point(1000, 125);
+                this->Controls->Add(titleLabel);
+                this->Refresh();
+                titleLabel->BringToFront();
+
+
+                this->loadMoreButton = (gcnew System::Windows::Forms::Button());
+                this->loadMoreButton->Location = System::Drawing::Point(200, 70); 
+                this->loadMoreButton->Size = System::Drawing::Size(75, 23); 
+                this->loadMoreButton->Text = L"Load More";
+                this->Controls->Add(this->loadMoreButton);
+
+                
+
+                this->linkLabel1->Location = System::Drawing::Point(600, 100);
+                this->linkLabel1->Name = L"linkLabel1";
+                this->linkLabel1->Size = System::Drawing::Size(39, 13);
+                this->linkLabel1->TabIndex = 1;
+                this->linkLabel1->Text = L"Saved";
+                this->linkLabel2->Location = System::Drawing::Point(650, 100);
+                this->linkLabel2->Name = L"linkLabel2";
+                this->linkLabel2->Size = System::Drawing::Size(67, 13);
+                this->linkLabel2->TabIndex = 2;
+                this->linkLabel2->Text = L"What we recommend for you";
+                this->linkLabel3->Location = System::Drawing::Point(1500, 100);
+                this->linkLabel3->Name = L"linkLabel3";
+                this->linkLabel3->Size = System::Drawing::Size(43, 13);
+                this->linkLabel3->TabIndex = 3;
+                this->linkLabel3->Text = L"Top rated";
+                this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+                this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
+                this->ClientSize = System::Drawing::Size(1043, 636);
+                this->Controls->Add(this->linkLabel3);
+                this->Controls->Add(this->linkLabel2);
+                this->Controls->Add(this->linkLabel1);
+                this->Name = L"MainPage";
+                this->Text = L"MainPage";
+                this->ResumeLayout(false);
+                this->PerformLayout();
+                System::Int32 topMargin = 300;
+                this->flowLayoutPanel->Dock = System::Windows::Forms::DockStyle::Top;
+                this->flowLayoutPanel->AutoScroll = true;
+                this->flowLayoutPanel->FlowDirection = System::Windows::Forms::FlowDirection::LeftToRight;
+                this->flowLayoutPanel->WrapContents = false;
+                this->flowLayoutPanel->Location = System::Drawing::Point(0, topMargin);
+                this->flowLayoutPanel->Size = System::Drawing::Size(this->Width, (this->Height - topMargin));
+                this->flowLayoutPanel->Anchor = ((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+                    | System::Windows::Forms::AnchorStyles::Right);
+                System::Windows::Forms::Panel^ scrollablePanel = (gcnew System::Windows::Forms::Panel());
+                scrollablePanel->Dock = System::Windows::Forms::DockStyle::Fill;
+                scrollablePanel->AutoScroll = true;
+                scrollablePanel->Controls->Add(this->flowLayoutPanel);
+                this->Controls->Add(scrollablePanel);
+
+                this->flowLayoutPanel2 = gcnew System::Windows::Forms::FlowLayoutPanel();
+                this->flowLayoutPanel2->AutoSize = true;
+                this->flowLayoutPanel2->Location = System::Drawing::Point(0, this->flowLayoutPanel->Bottom + 10);
+                this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
+                this->flowLayoutPanel2->Size = System::Drawing::Size(800, 450);
+
+                System::Windows::Forms::Panel^ scrollablePanel2 = (gcnew System::Windows::Forms::Panel());
+                scrollablePanel2->Dock = System::Windows::Forms::DockStyle::Fill;
+                scrollablePanel2->AutoScroll = true;
+                scrollablePanel2->Controls->Add(this->flowLayoutPanel2);
+
+                this->Controls->Add(scrollablePanel2);
+
+                this->linkLabel3->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel3_LinkClicked);
+                this->linkLabel1->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel1_LinkClicked);
+                this->linkLabel2->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel2_LinkClicked);
+             
+               
+                
+
+
+
+            }
 
 
 
