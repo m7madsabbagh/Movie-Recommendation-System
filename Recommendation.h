@@ -9,6 +9,7 @@
 #include <msclr\marshal_cppstd.h>
 #include "Movie.h"
 #include "User.h"
+#include "Overview.h"
 
 using namespace System;
 using namespace System::IO;
@@ -22,32 +23,39 @@ namespace LoginForm {
 
     public ref class Recommed : public System::Windows::Forms::Form
     {
-    private:
+
     private:
 
         List<String^>^ userGenrePreferences;
         List<Movie^>^ allMovies;
         HttpClient^ client;
         System::String^ Username;
-    private: System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel;
+    System::Windows::Forms::FlowLayoutPanel^ flowLayoutPanel;
+           System::Windows::Forms::Button^ loadMoreButton;
+            
+           
 
-
-        System::ComponentModel::Container^ components;
+           System::ComponentModel::Container^ components;
 
 
 
     public:
         Recommed(List<String^>^ userGenres, List<Movie^>^ allMovies, String^ LoggedInUsername);
+        
         void LoadLikedGenres(String^ username);
         void GetMovieListAsync(String^ genre);
         String^ GetGenreId(String^ genre);
         void HandleMovieListResponse(Task<HttpResponseMessage^>^ responseTask);
-        void CreatePictureBoxWithTitle(String^ path, String^ title);
+        void CreatePictureBoxWithTitle(String^ path, String^ title, String^ rating, int movieId);
         void InitializeComponent(void);
         delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
+        void GetMovieDetailsAsync(int movieId);
+           void HandleMovieDetailsResponse(Task<System::Net::Http::HttpResponseMessage^>^ responseTask);
+           void pictureBox_Click(Object^ sender, EventArgs^ e);
 
-    
-   
+       
+        
+
     };
 
 }
