@@ -128,6 +128,24 @@ namespace LoginForm {
             System::Diagnostics::Process::Start("https://www.gotocme.com/careers/");
         }
 
+        void OnIdle(Object^ sender, EventArgs^ e)
+        {
+            logoutButton_Click(sender, e);
+        }
+
+        void MainPage_KeyPress(Object^ sender, KeyPressEventArgs^ e)
+        {
+            
+            _idleTimer->Stop();
+            _idleTimer->Start();
+        }
+
+        void MainPage_MouseMove(Object^ sender, MouseEventArgs^ e)
+        {
+            
+            _idleTimer->Stop();
+            _idleTimer->Start();
+        }
        
 
 
@@ -172,7 +190,10 @@ namespace LoginForm {
             logoutButton->Click += gcnew System::EventHandler(this, &MainPage::logoutButton_Click);
             currentPage = 1;
             MakeRequestAsync();
-            
+            _idleTimer = gcnew Timer();
+            _idleTimer->Interval = 300000; 
+            _idleTimer->Tick += gcnew EventHandler(this, &MainPage::OnIdle);
+            _idleTimer->Start();
 
 
 
