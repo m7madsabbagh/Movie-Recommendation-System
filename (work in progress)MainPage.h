@@ -11,6 +11,7 @@
 #include "Movie.h"
 #include "TopRated.h"
 #include "Recommed.h"
+#include <tchar.h>
 
 
 
@@ -36,6 +37,7 @@ namespace LoginForm {
     private:
 
         HttpClient^ client;
+        Timer^ _idleTimer;
         Panel^ MoviesPanel;
         String^ username;
         String^ movieIdStr;
@@ -65,8 +67,10 @@ namespace LoginForm {
         delegate void PictureBoxWithTitleDelegate(String^ path, String^ title);
         System::Windows::Forms::Panel^ recommendedMoviesPanel;
         System::Windows::Forms::Button^ loadMoreButton;
+
         int currentPage;
         LoginForm^ loginForm;
+        void logoutButton_Click(Object^ sender, EventArgs^ e);
 
         System::Void linkLabel3_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
             TopRated^ topRatedForm = gcnew TopRated();
@@ -124,6 +128,8 @@ namespace LoginForm {
             System::Diagnostics::Process::Start("https://www.gotocme.com/careers/");
         }
 
+       
+
 
 
         System::Void linkLabel1_LinkClicked(System::Object^ sender, System::Windows::Forms::LinkLabelLinkClickedEventArgs^ e) {
@@ -163,10 +169,10 @@ namespace LoginForm {
 
             client = gcnew HttpClient();
             loadMoreButton->Click += gcnew System::EventHandler(this, &MainPage::loadMoreButton_Click);
+            logoutButton->Click += gcnew System::EventHandler(this, &MainPage::logoutButton_Click);
             currentPage = 1;
             MakeRequestAsync();
-            //DisplayRecommendedMovies();
-
+            
 
 
 
@@ -185,6 +191,9 @@ namespace LoginForm {
             currentPage++;
             MakeRequestAsync();
         }
+
+        
+        
 
 
 
@@ -382,6 +391,11 @@ namespace LoginForm {
             this->loadMoreButton->Text = L"Load More";
             this->Controls->Add(this->loadMoreButton);
 
+            this->logoutButton = (gcnew System::Windows::Forms::Button());
+            this->logoutButton->Location = System::Drawing::Point(1770, 20);
+            this->logoutButton->Size = System::Drawing::Size(100, 35);
+            this->logoutButton->Text = L"Logout";
+            this->Controls->Add(this->logoutButton);
 
 
             this->linkLabel1->Location = System::Drawing::Point(600, 220);
@@ -555,6 +569,7 @@ namespace LoginForm {
             this->linkLabel11->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel11_LinkClicked);
             this->linkLabel12->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel12_LinkClicked);
             this->linkLabel13->LinkClicked += gcnew System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &MainPage::linkLabel13_LinkClicked);
+        
 
 
 
