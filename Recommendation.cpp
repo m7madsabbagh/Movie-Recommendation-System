@@ -23,7 +23,7 @@ Recommed::Recommed(List<String^>^ userGenres, List<Movie^>^ allMovies, String^ L
 	Console::WriteLine("In the Recommed constructor");
 	this->userGenrePreferences = userGenres;
 	this->allMovies = allMovies;
-	
+
 	client = gcnew HttpClient();
 	InitializeComponent();
 	Username = LoggedInUsername;
@@ -34,7 +34,7 @@ Recommed::Recommed(List<String^>^ userGenres, List<Movie^>^ allMovies, String^ L
 
 void Recommed::LoadLikedGenres(String^ username)
 {
-	Console::WriteLine("Loading liked genres for " + username);	
+	Console::WriteLine("Loading liked genres for " + username);
 	gcnew String(User::Username.c_str());
 	try {
 		MySqlConnection^ con = gcnew MySqlConnection("Server=127.0.0.1;Uid=root;Pwd=;Database=database");
@@ -92,7 +92,7 @@ void Recommed::GetMovieListAsync(String^ genre)
 }
 
 
-
+delegate void PictureBoxWithTitleAndRatingDelegate(String^ path, String^ title, String^ rating, int movieId);
 void Recommed::HandleMovieListResponse(Task<HttpResponseMessage^>^ responseTask)
 {
 	Console::WriteLine("Handling API response...");
@@ -102,33 +102,41 @@ void Recommed::HandleMovieListResponse(Task<HttpResponseMessage^>^ responseTask)
 		contentTask->Wait();
 		String^ content = contentTask->Result;
 
-	
 		msclr::interop::marshal_context context;
 		std::string content_std_str = context.marshal_as<std::string>(content);
 
-	
 		rapidjson::Document d;
 		d.Parse(content_std_str.c_str());
 
 		if (d.IsObject() && d.HasMember("results") && d["results"].IsArray() && !d["results"].Empty()) {
-			// Taking the first result from the search
-			const rapidjson::Value& movie = d["results"][0];
+			const rapidjson::Value& results = d["results"];
+			for (rapidjson::SizeType i = 0; i < results.Size() && i < 10; i++) // Maximum 10 movies per genre
+			{
+				const rapidjson::Value& movie = results[i];
 
-			std::string title = movie["title"].GetString();
-			std::string overview = movie["overview"].GetString();
-			std::string posterPath = movie["poster_path"].GetString();
-			std::string release_date = movie["release_date"].GetString();
-			double rating = movie["vote_average"].GetDouble();
+				std::string title = movie["title"].GetString();
+				std::string overview = movie["overview"].GetString();
+				std::string posterPath = movie["poster_path"].GetString();
+				std::string release_date = movie["release_date"].GetString();
+				double rating = movie["vote_average"].GetDouble();
+				int movieId = d["results"][i]["id"].GetInt();
 
-			// Convert from std::string to System::String^
-			String^ title_managed = gcnew String(title.c_str());
-			String^ overview_managed = gcnew String(overview.c_str());
-			String^ posterPath_managed = gcnew String(posterPath.c_str());
-			String^ release_date_managed = gcnew String(release_date.c_str());
+				String^ title_managed = gcnew String(title.c_str());
+				String^ overview_managed = gcnew String(overview.c_str());
+				String^ posterPath_managed = gcnew String(posterPath.c_str());
+				String^ release_date_managed = gcnew String(release_date.c_str());
 
-			// Create PictureBox with title on UI thread
-			PictureBoxWithTitleDelegate^ action = gcnew PictureBoxWithTitleDelegate(this, &Recommed::CreatePictureBoxWithTitle);
-			this->Invoke(action, posterPath_managed, title_managed);
+				String^ rating_managed;
+				if (rating == static_cast<int>(rating)) {
+					rating_managed = String::Format("{0:F0}", rating); // No decimal part
+				}
+				else {
+					rating_managed = String::Format("{0:F2}", rating); // With two decimal places
+				}
+
+				PictureBoxWithTitleAndRatingDelegate^ action = gcnew PictureBoxWithTitleAndRatingDelegate(this, &Recommed::CreatePictureBoxWithTitle);
+				this->Invoke(action, posterPath_managed, title_managed, rating_managed, movieId);;
+			}
 		}
 		else {
 			Console::WriteLine("API request failed: " + response->StatusCode.ToString());
@@ -142,7 +150,61 @@ void Recommed::HandleMovieListResponse(Task<HttpResponseMessage^>^ responseTask)
 
 
 
-void Recommed::CreatePictureBoxWithTitle(String^ path, String^ title)
+
+
+void Recommed::pictureBox_Click(Object^ sender, EventArgs^ e) {
+	PictureBox^ picBox = safe_cast<PictureBox^>(sender);
+	int movieId = safe_cast<int>(picBox->Tag);
+	GetMovieDetailsAsync(movieId);
+}
+
+void Recommed::HandleMovieDetailsResponse(Task<HttpResponseMessage^>^ responseTask) {
+	auto response = responseTask->Result;
+	if (response->IsSuccessStatusCode) {
+		auto contentTask = response->Content->ReadAsStringAsync();
+		contentTask->Wait();
+		String^ content = contentTask->Result;
+
+		// Convert from System::String^ to std::string
+		msclr::interop::marshal_context context;
+		std::string content_std_str = context.marshal_as<std::string>(content);
+
+		// Parse with RapidJSON
+		rapidjson::Document d;
+		d.Parse(content_std_str.c_str());
+
+		if (d.IsObject()) {
+			std::string title = d["title"].GetString();
+			std::string overview = d["overview"].GetString();
+			std::string posterPath = d["poster_path"].GetString();
+			std::string release_date = d["release_date"].GetString();
+			double rating = d["vote_average"].GetDouble();
+			int movieId = d["id"].GetInt();
+
+			String^ title_managed = gcnew String(title.c_str());
+			String^ overview_managed = gcnew String(overview.c_str());
+			String^ posterPath_managed = gcnew String(posterPath.c_str());
+			String^ release_date_managed = gcnew String(release_date.c_str());
+
+			Overview^ overviewForm = gcnew Overview(title_managed, overview_managed, "https://image.tmdb.org/t/p/w500" + posterPath_managed, release_date_managed, rating);
+			overviewForm->ShowDialog();
+
+		}
+		else {
+			Console::WriteLine("API request failed: " + response->StatusCode.ToString());
+		}
+	}
+}
+void Recommed::GetMovieDetailsAsync(int movieId) {
+	String^ apiKey = "e18bd6b624b9b189e366056ce94a353c";
+	String^ apiUrl = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey;
+	auto responseTask = client->GetAsync(apiUrl);
+	responseTask->ContinueWith(gcnew Action<Task<HttpResponseMessage^>^>(this, &Recommed::HandleMovieDetailsResponse));
+
+}
+
+
+void Recommed::CreatePictureBoxWithTitle(String^ path, String^ title, String^ rating, int movieId)
 {
 	Console::WriteLine("Creating PictureBox for title: " + title);
 
@@ -154,6 +216,12 @@ void Recommed::CreatePictureBoxWithTitle(String^ path, String^ title)
 	pictureBox->SizeMode = PictureBoxSizeMode::StretchImage;
 	pictureBox->Size = Drawing::Size(picBoxWidth, picBoxHeight);
 	pictureBox->ImageLocation = "https://image.tmdb.org/t/p/w500" + path;
+	pictureBox->Tag = title; // Store movie title in the Tag property.
+
+
+	pictureBox->Tag = movieId;
+	pictureBox->Click += gcnew System::EventHandler(this, &Recommed::pictureBox_Click);
+
 
 	Label^ titleLabel = gcnew Label();
 	titleLabel->Text = title;
@@ -161,16 +229,23 @@ void Recommed::CreatePictureBoxWithTitle(String^ path, String^ title)
 	titleLabel->TextAlign = ContentAlignment::MiddleCenter;
 	titleLabel->Location = Point(0, picBoxHeight);
 
+	Label^ ratingLabel = gcnew Label();
+	ratingLabel->Text = "Rating: " + rating;
+	ratingLabel->Size = Drawing::Size(100, 20);
+	ratingLabel->Location = Point(picBoxWidth - ratingLabel->Width, 0);
+	ratingLabel->BackColor = Color::White;
+	pictureBox->Controls->Add(ratingLabel);
+	ratingLabel->Text = rating + "%";
+
 	Panel^ panel = gcnew Panel();
 	panel->Size = Drawing::Size(picBoxWidth, picBoxHeight + labelHeight);
 	panel->Controls->Add(pictureBox);
 	panel->Controls->Add(titleLabel);
 
-
 	this->flowLayoutPanel->Controls->Add(panel);
 	this->flowLayoutPanel->BringToFront();
-	
 }
+
 
 void Recommed::InitializeComponent(void)
 {
