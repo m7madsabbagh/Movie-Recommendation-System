@@ -17,7 +17,7 @@ System::Windows::Forms::Label^ LoginForm::Overview::CreateLabel(System::String^ 
     return label;
 }
 
-
+//constructor w ta7to front end design
 LoginForm::Overview::Overview(System::String^ title, System::String^ overview, System::String^ posterPath, System::String^ release_date, double rating)
 {
     this->Username = title;
@@ -83,71 +83,169 @@ LoginForm::Overview::Overview(System::String^ title, System::String^ overview, S
     this->saveRatingButton->Text = "Save Rating";
     this->saveRatingButton->Click += gcnew System::EventHandler(this, &LoginForm::Overview::SaveRatingButton_Click);
     tableLayoutPanel->Controls->Add(this->saveRatingButton, 0, 7);
+
+    //Button for the unsave 
+    
+    this->unsaveButton = gcnew Button();
+    this->unsaveButton->Text = "Unsave Movie";
+    this->unsaveButton->Click += gcnew System::EventHandler(this, &LoginForm::Overview::UnsaveMovieButton_Click);
+    tableLayoutPanel->Controls->Add(this->unsaveButton, 0, 5);
+
+    // Create TextBox for user input
+    this->commentBox = gcnew TextBox();
+    this->commentBox->Multiline = true;
+    this->commentBox->Height = 60;
+    tableLayoutPanel->Controls->Add(this->commentBox, 0, 8);
+
+    // Create Button for submitting the comment
+    this->submitCommentButton = gcnew Button();
+    this->submitCommentButton->Text = "Submit Comment";
+    this->submitCommentButton->Click += gcnew System::EventHandler(this, &LoginForm::Overview::SubmitCommentButton_Click);
+    tableLayoutPanel->Controls->Add(this->submitCommentButton, 0, 9);
+
+    // Create ListBox to display the comments
+    this->commentsList = gcnew ListBox();
+    tableLayoutPanel->Controls->Add(this->commentsList, 0, 10);
+    tableLayoutPanel->SetColumnSpan(this->commentsList, 2);
+
+    LoadComments();
+
 }
 
-System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e)
-{
-    // Get the username from the User class
-    std::string username_std = User::Username;
+    System::Void LoginForm::Overview::SaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        // Get the username from the User class
+        std::string username_std = User::Username;
 
-    // Convert std::string to System::String^
-    String^ username_cli = gcnew String(username_std.c_str());
+        // Convert std::string to System::String^
+        String^ username_cli = gcnew String(username_std.c_str());
 
-    String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
-    MySqlConnection^ con = gcnew MySqlConnection(constr);
+        String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+        MySqlConnection^ con = gcnew MySqlConnection(constr);
 
-    try {
-        con->Open();
+        
 
-        MySqlCommand^ checkCommand = gcnew MySqlCommand("SELECT COUNT(*) FROM user_reg WHERE Username = @Username", con);
-        checkCommand->Parameters->AddWithValue("@Username", username_cli);
+        try {
+            con->Open();
 
-        int count = Convert::ToInt32(checkCommand->ExecuteScalar());
+            MySqlCommand^ checkUserCommand = gcnew MySqlCommand("SELECT COUNT(*) FROM user_reg WHERE Username = @Username", con);
+            checkUserCommand->Parameters->AddWithValue("@Username", username_cli);
 
-        if (count == 0) {
-            MessageBox::Show("Username does not exist in the database!");
-            return;
+            int count = Convert::ToInt32(checkUserCommand->ExecuteScalar());
+
+            if (count == 0) {
+                MessageBox::Show("Username does not exist in the database!");
+                return;
+            }
+
+            MySqlCommand^ checkExistCommand = gcnew MySqlCommand("SELECT COUNT(*) FROM saving_reg WHERE Username = @Username AND MovieID = @MovieID", con);
+            checkExistCommand->Parameters->AddWithValue("@Username", username_cli);
+            checkExistCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+
+            int exists = Convert::ToInt32(checkExistCommand->ExecuteScalar());
+
+            if (exists > 0) {
+                MessageBox::Show("This movie is already saved!");
+                return;
+            }
+
+            MySqlCommand^ insertCommand = gcnew MySqlCommand("INSERT INTO saving_reg (Username, MovieID) VALUES (@Username, @MovieID)", con);
+            insertCommand->Parameters->AddWithValue("@Username", username_cli);
+            insertCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+            insertCommand->ExecuteNonQuery();
+            insertCommand->ExecuteNonQuery();
+            MessageBox::Show("Successfully saved!");
+
+            
+            OnMovieSaved(this->MovieID);
+
+            MessageBox::Show("Successfully saved!");
         }
-
-        MySqlCommand^ getCommand = gcnew MySqlCommand("SELECT MovieID FROM user_reg WHERE Username = @Username", con);
-        getCommand->Parameters->AddWithValue("@Username", username_cli);
-
-        MySqlDataReader^ reader = getCommand->ExecuteReader();
-
-        System::String^ currentMovieIds = nullptr;
-        if (reader->Read()) {
-            currentMovieIds = reader->GetString(0);
+        catch (Exception^ ex) {
+            MessageBox::Show(ex->Message);
         }
-        reader->Close();
-
-        System::String^ newMovieIds;
-        if (String::IsNullOrEmpty(currentMovieIds)) {
-            newMovieIds = this->MovieID;
-        }
-        else {
-            newMovieIds = currentMovieIds + "," + this->MovieID;
-        }
-
-        Console::WriteLine("Current Movie IDs: " + currentMovieIds);
-        Console::WriteLine("New Movie IDs: " + newMovieIds);
-
-        MySqlCommand^ updateCommand = gcnew MySqlCommand("UPDATE user_reg SET MovieID = @MovieID WHERE Username = @Username", con);
-        updateCommand->Parameters->AddWithValue("@MovieID", newMovieIds);
-        updateCommand->Parameters->AddWithValue("@Username", username_cli);
-
-        updateCommand->ExecuteNonQuery();
-
-        MessageBox::Show("Successfully saved!");
-    }
-    catch (Exception^ ex) {
-        MessageBox::Show(ex->Message);
-    }
-    finally {
-        if (con->State == ConnectionState::Open) {
-            con->Close();
+        finally {
+            if (con->State == ConnectionState::Open) {
+                con->Close();
+            }
         }
     }
-}
+
+    void LoginForm::Overview::LoadComments()
+    {
+        // Get the username from the User class
+        std::string username_std = User::Username;
+
+        // Convert std::string to System::String^
+        String^ username_cli = gcnew String(username_std.c_str());
+
+        String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+        MySqlConnection^ con = gcnew MySqlConnection(constr);
+
+        try {
+            con->Open();
+
+            MySqlCommand^ getCommentsCommand = gcnew MySqlCommand("SELECT Username, Comment FROM Comments_reg WHERE MovieID = @MovieID", con);
+            getCommentsCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+
+            MySqlDataReader^ reader = getCommentsCommand->ExecuteReader();
+
+            while (reader->Read()) {
+                this->commentsList->Items->Add(reader["Username"] + ": " + reader["Comment"]);
+            }
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show(ex->Message);
+        }
+        finally {
+            if (con->State == ConnectionState::Open) {
+                con->Close();
+            }
+        }
+    }
+
+    System::Void LoginForm::Overview::SubmitCommentButton_Click(System::Object^ sender, System::EventArgs^ e)
+    {
+        // Get the username from the User class
+        std::string username_std = User::Username;
+
+        // Convert std::string to System::String^
+        String^ username_cli = gcnew String(username_std.c_str());
+
+        // Get the comment from the TextBox
+        String^ comment = this->commentBox->Text;
+
+        String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+        MySqlConnection^ con = gcnew MySqlConnection(constr);
+
+        try {
+            con->Open();
+
+            MySqlCommand^ insertCommand = gcnew MySqlCommand("INSERT INTO Comments_reg (Username, MovieID, Comment) VALUES (@Username, @MovieID, @Comment)", con);
+            insertCommand->Parameters->AddWithValue("@Username", username_cli);
+            insertCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+            insertCommand->Parameters->AddWithValue("@Comment", comment);
+
+            insertCommand->ExecuteNonQuery();
+
+            MessageBox::Show("Successfully submitted the comment!");
+
+            // Add the comment to the ListBox
+            this->commentsList->Items->Add(username_cli + ": " + comment);
+
+            // Clear the TextBox
+            this->commentBox->Text = "";
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show(ex->Message);
+        }
+        finally {
+            if (con->State == ConnectionState::Open) {
+                con->Close();
+            }
+        }
+    }
+
 System::Void LoginForm::Overview::SaveRatingButton_Click(System::Object^ sender, System::EventArgs^ e)
 {
     // Get the username from the User class
@@ -183,6 +281,44 @@ System::Void LoginForm::Overview::SaveRatingButton_Click(System::Object^ sender,
         }
     }
 }
+System::Void LoginForm::Overview::UnsaveMovieButton_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    // Get the username from the User class
+    std::string username_std = User::Username;
+
+    // Convert std::string to System::String^
+    String^ username_cli = gcnew String(username_std.c_str());
+
+    String^ constr = "Server=127.0.0.1;Uid=root;Pwd=;Database=database";
+    MySqlConnection^ con = gcnew MySqlConnection(constr);
+
+    try {
+        con->Open();
+
+        MySqlCommand^ deleteCommand = gcnew MySqlCommand("DELETE FROM saving_reg WHERE Username = @Username AND MovieID = @MovieID", con);
+        deleteCommand->Parameters->AddWithValue("@Username", username_cli);
+        deleteCommand->Parameters->AddWithValue("@MovieID", this->MovieID);
+
+        int rowsAffected = deleteCommand->ExecuteNonQuery();
+
+        if (rowsAffected > 0) {
+            MessageBox::Show("Successfully unsaved the movie!");
+        }
+        else {
+            MessageBox::Show("Movie is not saved.");
+        }
+    }
+    catch (Exception^ ex) {
+        MessageBox::Show(ex->Message);
+    }
+    finally {
+        if (con->State == ConnectionState::Open) {
+            con->Close();
+        }
+    }
+}
+
+
 
 LoginForm::Overview::~Overview()
 {
